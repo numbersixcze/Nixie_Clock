@@ -1,1 +1,1 @@
--zavést monitoring napìtí (udìlat nastavitelné napìtí na digitronech, monitorovat spotøebu?), multiplax, 595 na další výstupy, pøerušení, relé, 
+-zavést monitoring napìtí (udìlat nastavitelné napìtí na digitronech, monitorovat spotøebu?), multiplex MAX4734, 595 na další výstupy, pøerušení, relé, 
