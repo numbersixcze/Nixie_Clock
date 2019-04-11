@@ -32,24 +32,26 @@ void setup()  {
   //while (!Serial) ; // Needed for Leonardo only
   //setSyncProvider( requestSync);  //set function to call when sync required
   Serial.println("Waiting for sync message");
-  setTime(1357041600);
+  setTime(1554890400);
+
 }
 
 void loop(){    
-  if (Serial.available() > 1) { // wait for at least two characters
+  /*if (Serial.available() > 1) { // wait for at least two characters
     char c = Serial.read();
     if( c == TIME_HEADER) {
       processSyncMessage();
     }
-    else if( c== FORMAT_HEADER) {
+    else if( c == FORMAT_HEADER) {
       processFormatMessage();
     }
   }
   if (timeStatus()!= timeNotSet) {
+    Serial.println("a");
     digitalClockDisplay();  
-  }
+  }*/
 
-  
+  //setTime(1554890400);//813600
   digitalClockDisplay();
   
   delay(1000);
@@ -99,7 +101,7 @@ void  processFormatMessage() {
 
 void processSyncMessage() {
   unsigned long pctime;
-  const unsigned long DEFAULT_TIME = 1357041600; // Jan 1 2013 - paul, perhaps we define in time.h? 1357041600
+  const unsigned long DEFAULT_TIME = 1523440800; // Jan 1 2013 - paul, perhaps we define in time.h? 1357041600
 
    pctime = Serial.parseInt();
    if( pctime >= DEFAULT_TIME) { // check the integer is a valid time (greater than Jan 1 2013)
