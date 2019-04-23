@@ -9,8 +9,8 @@
 #include <ESP8266WiFi.h>
 #include <WiFiUdp.h>
 
-const char ssid[] = "Sadova";  //  your network SSID (name)
-const char pass[] = "Vera7171";       // your network password
+const char ssid[] = "Connectify-me";  //  your network SSID (name)
+const char pass[] = "Regulace60";       // your network password
 
 // NTP Servers:
 static const char ntpServerName[] = "ntp.cesnet.cz";
