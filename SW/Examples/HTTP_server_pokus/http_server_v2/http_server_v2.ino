@@ -19,7 +19,7 @@ void setup(void){
   delay(10);
   Serial.println('\n');
 
-  WiFi.begin("TP-LINK", "Regulace150");
+  WiFi.begin("Connectify-me", "Regulace60");
   Serial.print("Connecting");
   while (WiFi.status() != WL_CONNECTED)
   {
@@ -81,4 +81,3 @@ void handleMessage(){
   server.send(200, "text/html", "<script type='text/javascript'> window.location = '/budicek'; </script>");
 
 }
-

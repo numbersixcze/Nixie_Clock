@@ -8,6 +8,38 @@
 #include <TimeLib.h>
 #include <ESP8266WiFi.h>
 #include <WiFiUdp.h>
+#include <WiFiClient.h>
+#include <ESP8266WebServer.h>
+
+
+ESP8266WebServer server(80);    // Create a webserver object that listens for HTTP request on port 80
+
+void handleRoot();              // function prototypes for HTTP handlers
+void handleNotFound();
+void handleLogin();
+void handleBudicek();
+void handleMessage();
+
+String iHours = "1";
+String iMinutes = "1";
+String iSeconds = "1";
+String iDays = "1";
+String iMonths = "1";
+String iYears = "1";
+
+
+int intHours = 2;
+int intMinutes = 2;
+int intSeconds = 2;
+int intDays = 2;
+int intMonths = 2;
+int intYears = 2;
+
+String test = "1";
+String test2 = "2";
+int testInt = 1;
+int test2Int = 2;
+
 
 const char ssid[] = "Connectify-me";  //  your network SSID (name)
 const char pass[] = "Regulace60";       // your network password
@@ -59,6 +91,16 @@ void setup()
   Serial.println("waiting for sync");
   setSyncProvider(getNtpTime);
   setSyncInterval(300);
+
+
+  server.on("/", HTTP_GET, handleRoot);        // Call the 'handleRoot' function when a client requests URI "/"
+  server.on("/login", HTTP_POST, handleLogin); // Call the 'handleLogin' function when a POST request is made to URI "/login"
+  server.on("/message",HTTP_POST,handleMessage);
+  server.on("/budicek", HTTP_GET, handleBudicek); // Call the 'handleLogin' function when a POST request is made to URI "/login"
+  server.onNotFound(handleNotFound);           // When a client requests an unknown URI (i.e. something other than "/"), call function "handleNotFound"
+
+  server.begin();                           // Actually start the server
+  Serial.println("HTTP server started");
 }
 
 time_t prevDisplay = 0; // when the digital clock was displayed
@@ -71,6 +113,8 @@ void loop()
       digitalClockDisplay();
     }
   }
+
+  server.handleClient(); 
 }
 
 void digitalClockDisplay()
@@ -154,4 +198,57 @@ void sendNTPpacket(IPAddress &address)
   Udp.beginPacket(address, 123); //NTP requests are to port 123
   Udp.write(packetBuffer, NTP_PACKET_SIZE);
   Udp.endPacket();
+}
+
+
+void handleRoot() {                          // When URI / is requested, send a web page with a button to toggle the LED
+  server.send(200, "text/html", "<form action=\"/login\" method=\"POST\"><input type=\"text\" name=\"username\" placeholder=\"Uzivatel\"></br><input type=\"password\" name=\"password\" placeholder=\"Heslo\"></br><input type=\"submit\" value=\"Login\"></form><p>Zkus 'admin' a heslo 'admin' ...</p>");
+}
+
+void handleLogin() {                         // If a POST request is made to URI /login
+  if( ! server.hasArg("username") || ! server.hasArg("password") 
+      || server.arg("username") == NULL || server.arg("password") == NULL) { // If the POST request doesn't have username and password data
+    server.send(400, "text/plain", "400: Invalid Request");         // The request is invalid, so send HTTP status 400
+    return;
+  }
+  if(server.arg("username") == "admin" && server.arg("password") == "admin") { // If both the username and the password are correct
+    server.send(200, "text/html", "<meta charset='UTF-8'> <h1>Welcome, " + server.arg("username") + "!</h1><p> successful</p>");
+  } else {                                                                              // Username and password don't match
+    server.send(401, "text/plain", "401: Unauthorized");
+  }
+}
+
+
+
+
+
+void handleBudicek(){
+ server.send(200, "text/html", "<meta charset='UTF-8'> <h1>Čas, !</h1><p> Time: " + iHours + " " + iMinutes + " " + iSeconds + " " + iDays + " " + iMonths + " " + iYears + "</p> <a href='/'><button>Go to home</button></a> <form action='/message' method='POST'> h: <input type='text' name='fHours'/> m: <input type='text' name='fMinutes'/>  s: <input type='text' name='fSeconds'/> <br> d: <input type='text' name='fDays'/> m: <input type='text' name='fMonths'/> y: <input type='text' name='fYears'/> <input type='submit' value='Submit'/> </form>");
+}
+
+void handleNotFound(){
+  server.send(404, "text/plain", "404: Not found"); // Send HTTP status 404 (Not Found) when there's no handler for the URI in the request
+}
+
+
+void handleMessage(){
+  if(server.hasArg("fHours") && server.hasArg("fMinutes") && server.hasArg("fSeconds") && server.hasArg("fDays") && server.hasArg("fMonths") && server.hasArg("fYears")){
+    iHours = server.arg("fHours");
+    iMinutes = server.arg("fMinutes");
+    iSeconds = server.arg("fSeconds");
+    iDays = server.arg("fDays");
+    iMonths = server.arg("fMonths");
+    iYears = server.arg("fYears");
+
+    intHours = iHours.toInt();
+    intMinutes = iMinutes.toInt();
+    intSeconds = iSeconds.toInt();
+    intDays = iDays.toInt();
+    intMonths = iMonths.toInt();
+    intYears = iYears.toInt();
+
+    setTime(intHours,intMinutes,intSeconds,intDays,intMonths,intYears);
+  }
+  server.send(200, "text/html", "<script type='text/javascript'> window.location = '/budicek'; </script>");
+
 }
