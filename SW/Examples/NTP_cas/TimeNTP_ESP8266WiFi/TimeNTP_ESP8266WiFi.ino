@@ -40,9 +40,11 @@ String test2 = "2";
 int testInt = 1;
 int test2Int = 2;
 
+bool isNtpSet = false;
 
-const char ssid[] = "Connectify-me";  //  your network SSID (name)
-const char pass[] = "Regulace60";       // your network password
+
+const char ssid[] = "TP-LINK";  //  your network SSID (name)
+const char pass[] = "Regulace150";       // your network password
 
 // NTP Servers:
 static const char ntpServerName[] = "ntp.cesnet.cz";
@@ -107,12 +109,12 @@ time_t prevDisplay = 0; // when the digital clock was displayed
 
 void loop()
 {
-  if (timeStatus() != timeNotSet) {
+  //if (timeStatus() != timeNotSet) {
     if (now() != prevDisplay) { //update the display only if time has changed
       prevDisplay = now();
       digitalClockDisplay();
     }
-  }
+  //}
 
   server.handleClient(); 
 }
@@ -163,6 +165,8 @@ time_t getNtpTime()
     int size = Udp.parsePacket();
     if (size >= NTP_PACKET_SIZE) {
       Serial.println("Receive NTP Response");
+      isNtpSet = true;
+
       Udp.read(packetBuffer, NTP_PACKET_SIZE);  // read packet into the buffer
       unsigned long secsSince1900;
       // convert four bytes starting at location 40 to a long integer
@@ -173,8 +177,10 @@ time_t getNtpTime()
       return secsSince1900 - 2208988800UL + timeZone * SECS_PER_HOUR;
     }
   }
+
   Serial.println("No NTP Response :-(");
-  return 0; // return 0 if unable to get the time
+  isNtpSet = false;
+  return 0;
 }
 
 // send an NTP request to the time server at the given address
@@ -211,8 +217,9 @@ void handleLogin() {                         // If a POST request is made to URI
     server.send(400, "text/plain", "400: Invalid Request");         // The request is invalid, so send HTTP status 400
     return;
   }
+
   if(server.arg("username") == "admin" && server.arg("password") == "admin") { // If both the username and the password are correct
-    server.send(200, "text/html", "<meta charset='UTF-8'> <h1>Welcome, " + server.arg("username") + "!</h1><p> successful</p>");
+    server.send(200, "text/html", "<meta charset='UTF-8'> <style>.dot{width:16px;height:16px;background-color:gray;border-radius:50%;display:inline-block}.dot.red{background-color:red}.dot.green{background-color:green}</style> <h1>Welcome, " + server.arg("username") + "!</h1><p> successful</p> <div style='position: absolute; right: 64px; top: 0px;'>NTP: <span class='" + (isNtpSet ? "green" : "red") + " dot'></span></div>");
   } else {                                                                              // Username and password don't match
     server.send(401, "text/plain", "401: Unauthorized");
   }

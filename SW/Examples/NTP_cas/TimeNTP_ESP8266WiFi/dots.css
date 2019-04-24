@@ -1,0 +1,33 @@
+.dot {
+    width: 16px;
+    height: 16px;
+    background-color: gray;
+    border-radius: 50%;
+    display: inline-block;
+}
+
+.dot.red {
+    background-color: red;
+}
+
+.dot.green {
+    background-color: green;
+}
+
+.dot{width:16px;height:16px;background-color:gray;border-radius:50%;display:inline-block}.dot.red{background-color:red}.dot.green{background-color:green}
+
+<span class="dot"></span>
+
+
+clock---hh-mm...
+NTP: ON/OFF
+
+Alarm: ON/OFF
+hh:mm
+
+(button) Set time
+(button) Set Alarm
+
+
+
+
