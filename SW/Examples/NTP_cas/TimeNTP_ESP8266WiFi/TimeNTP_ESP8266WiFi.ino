@@ -21,6 +21,7 @@ void handleSetTime();
 void handleSetMessage();
 void handleAlarm();
 void handleAlarmMessage();
+void handleAlarmOff();
 
 String iHours = "1";
 String iMinutes = "1";
@@ -102,6 +103,7 @@ void setup()
   server.on("/settime", HTTP_GET, handleSetTime); // Call the 'handleLogin' function when a POST request is made to URI "/login"
   server.on("/alarm", HTTP_GET, handleAlarm); // Call the 'handleLogin' function when a POST request is made to URI "/login"
   server.on("/alarmmessage",HTTP_POST,handleAlarmMessage);
+  server.on("/alarmoff",HTTP_GET,handleAlarmOff);
   server.onNotFound(handleNotFound);           // When a client requests an unknown URI (i.e. something other than "/"), call function "handleNotFound"
 
   server.begin();                           // Actually start the server
@@ -234,7 +236,7 @@ void handleLogin() {                         // If a POST request is made to URI
   }
 
   if(server.arg("username") == "admin" && server.arg("password") == "admin") { // If both the username and the password are correct
-    server.send(200, "text/html", "<meta charset='UTF-8'> <style>.dot{width:16px;height:16px;background-color:gray;border-radius:50%;display:inline-block}.dot.red{background-color:red}.dot.green{background-color:green}</style> <h1>Welcome, " + server.arg("username") + "!</h1><p> successful</p> <br> <a href='/settime'><button>Nastavení času</button> </a> <br> <a href='/alarm'><button>Nastavení budíčku</button> </a><div style='position: absolute; right: 64px; top: 0px;'>NTP: <span class='" + (isNtpSet ? "green" : "red") + " dot'></span></div>");
+    server.send(200, "text/html", "<meta charset='UTF-8'> <style>.dot{width:16px;height:16px;background-color:gray;border-radius:50%;display:inline-block}.dot.red{background-color:red}.dot.green{background-color:green}</style> <h1>Vítejte " + server.arg("username") + "!</h1><br> Aktualni čas(h,m,s,d,m,r): " + hour() + " :" + minute() + " :" + second() + " :" + day() + " :" + month() + " :" + year() +  "<br> <a href='/settime'><button>Nastavení času</button> </a> <br> <a href='/alarm'><button>Nastavení budíčku</button> </a><div style='position: absolute; right: 64px; top: 20px;'>NTP: <span class='" + (isNtpSet ? "green" : "red") + " dot'></span></div> <div style='position: absolute; right: 64px; top: 40px;'>Budíček: <span class='" + (isAlarmSet ? "green" : "red") + " dot'></span></div>");
   } else {                                                                              // Username and password don't match
     server.send(401, "text/plain", "401: Unauthorized");
   }
@@ -276,18 +278,22 @@ void handleSetMessage(){
 
 
 void handleAlarm(){
- server.send(200, "text/html", "<style>.dot{width:16px;height:16px;background-color:gray;border-radius:50%;display:inline-block}.dot.red{background-color:red}.dot.green{background-color:green}</style> <meta charset='UTF-8'> <h1>Budíček!</h1> <p> Alarm: <br>" "h:"+ aHours + "  m:" + aMinutes + "</p> <a href='/'><button>Go to home</button></a> <form action='/alarmmessage' method='POST'> h: <input type='text' name='afHours'/> m: <input type='text' name='afMinutes'/> <input type='submit' value='Submit'/> </form> <div style='position: absolute; right: 64px; top: 0px;'>Budíček: <span class='" + (isAlarmSet ? "green" : "red") + " dot'></span></div>");
+ server.send(200, "text/html", "<style>.dot{width:16px;height:16px;background-color:gray;border-radius:50%;display:inline-block}.dot.red{background-color:red}.dot.green{background-color:green}</style> <meta charset='UTF-8'> <h1>Budíček</h1> <p> Alarm: <br>" "h:"+ aHours + "  m:" + aMinutes + "</p> <a href='/'><button>Go to home</button></a> <form action='/alarmoff' method='GET'> <input type='submit' value='Vypnout budík'/> </form> <form action='/alarmmessage' method='POST'> h: <input type='text' name='afHours'/> m: <input type='text' name='afMinutes'/> <input type='submit' value='Nastavit'/> </form> <div style='position: absolute; right: 64px; top: 0px;'>Budíček: <span class='" + (isAlarmSet ? "green" : "red") + " dot'></span></div>");
 }
 
 void handleAlarmMessage(){
   if(server.hasArg("afHours") && server.hasArg("afMinutes")){
     aHours = server.arg("afHours");
     aMinutes = server.arg("afMinutes");
- 
     aintHours = aHours.toInt();
     aintMinutes = aHours.toInt();
     isAlarmSet = true;
   }
   
+  server.send(200, "text/html", "<script type='text/javascript'> window.location = '/alarm'; </script>");
+}
+
+void handleAlarmOff(){
+  isAlarmSet = false;
   server.send(200, "text/html", "<script type='text/javascript'> window.location = '/alarm'; </script>");
 }
