@@ -235,7 +235,7 @@ void sendNTPpacket(IPAddress &address)
 
 
 void handleRoot() {                          // When URI / is requested, send a web page with a button to toggle the LED
-  server.send(200, "text/html", "<form action=\"/login\" method=\"POST\"><input type=\"text\" name=\"username\" placeholder=\"Uzivatel\"></br><input type=\"password\" name=\"password\" placeholder=\"Heslo\"></br><input type=\"submit\" value=\"Login\"></form><p>Zkus 'admin' a heslo 'admin' ...</p>");
+  server.send(200, "text/html", "<meta charset='UTF-8'> <form action=\"/login\" method=\"POST\"><input type=\"text\" name=\"username\" placeholder=\"Uživatel\"></br><input type=\"password\" name=\"password\" placeholder=\"Heslo\"></br><input type=\"submit\" value=\"Přihlásit\"></form><p>Zkus 'admin' a heslo 'admin' ...</p>");
   //server.send(200, "text/html", renderTest(iHours,"nope")) ;
 }
 
@@ -258,7 +258,13 @@ void handleLogin() {                         // If a POST request is made to URI
 
 
 void handleSetTime(){
- server.send(200, "text/html", "<meta charset='UTF-8'> <h1>Čas, !</h1><p> Time: " + iHours + " " + iMinutes + " " + iSeconds + " " + iDays + " " + iMonths + " " + iYears + "</p> <a href='/'><button>Go to home</button></a> <form action='/setmessage' method='POST'> h: <input type='text' name='fHours'/> m: <input type='text' name='fMinutes'/>  s: <input type='text' name='fSeconds'/> <br> d: <input type='text' name='fDays'/> m: <input type='text' name='fMonths'/> y: <input type='text' name='fYears'/> <input type='submit' value='Submit'/> </form>");
+  iHours   =    hour();
+  iMinutes =  minute();
+  iSeconds =  second();
+  iDays    =     day();
+  iMonths  =   month();
+  iYears   =    year(); 
+  server.send(200, "text/html", "<meta charset='UTF-8'> <h1>Čas, !</h1><p> Time: <br>(h,m,s) " + iHours + " :" + iMinutes + " :" + iSeconds + "<br> (d,m,r) " + iDays + " ." + iMonths + " ." + iYears + "</p> <a href='/'><button>Zpět domů</button></a> <form action='/setmessage' method='POST'> h: <input type='text' name='fHours'/> m: <input type='text' name='fMinutes'/>  s: <input type='text' name='fSeconds'/> <br> d: <input type='text' name='fDays'/> m: <input type='text' name='fMonths'/> r: <input type='text' name='fYears'/> <input type='submit' value='Odeslat'/> </form>");
 }
 
 void handleNotFound(){
@@ -289,25 +295,18 @@ void handleSetMessage(){
           if((intHours <= 24) && (intHours >= 0) && (intMinutes >= 0) && (intMinutes <= 60) && (intSeconds >= 0) && (intSeconds <= 60)){
             if((intDays <= 31) && (intDays > 0) && (intMonths >= 1) && (intMonths <= 12) && (intYears >= 1970)){
               setTime(intHours,intMinutes,intSeconds,intDays,intMonths,intYears);
-              iHours =    hour();
-              iMinutes =  minute();
-              iSeconds =  second();
-              iDays =     day();
-              iMonths =   month();
-              iYears =    year();
-
               server.send(200, "text/html", "<script type='text/javascript'> window.location = '/settime'; </script>");
               return;
             }
           }
       }
-          server.send(400, "text/html", "<meta charset='UTF-8'> 400: Invalid Request <br> <a href='/settime'><button>Vrátit zpět</button>");
+    server.send(400, "text/html", "<meta charset='UTF-8'> 400: Invalid Request <br> <a href='/settime'><button>Vrátit zpět</button>");
     }
 }
 
 
 void handleAlarm(){
- server.send(200, "text/html", "<style>.dot{width:16px;height:16px;background-color:gray;border-radius:50%;display:inline-block}.dot.red{background-color:red}.dot.green{background-color:green}</style> <meta charset='UTF-8'> <h1>Budíček</h1> <p> Alarm: <br>" "h:"+ aHours + "  m:" + aMinutes + "</p> <a href='/'><button>Go to home</button></a> <form action='/alarmoff' method='GET'> <input type='submit' value='Vypnout budík'/> </form> <form action='/alarmmessage' method='POST'> h: <input type='text' name='afHours'/> m: <input type='text' name='afMinutes'/> <input type='submit' value='Nastavit'/> </form> <div style='position: absolute; right: 64px; top: 0px;'>Budíček: <span class='" + (isAlarmSet ? "green" : "red") + " dot'></span></div>");
+ server.send(200, "text/html", "<style>.dot{width:16px;height:16px;background-color:gray;border-radius:50%;display:inline-block}.dot.red{background-color:red}.dot.green{background-color:green}</style> <meta charset='UTF-8'> <h1>Budíček</h1> <p> Alarm: <br>" "h:"+ aHours + "  m:" + aMinutes + "</p> <a href='/'><button>Zpět domů</button></a> <form action='/alarmoff' method='GET'> <input type='submit' value='Vypnout budík'/> </form> <form action='/alarmmessage' method='POST'> h: <input type='text' name='afHours'/> m: <input type='text' name='afMinutes'/> <input type='submit' value='Nastavit'/> </form> <div style='position: absolute; right: 64px; top: 0px;'>Budíček: <span class='" + (isAlarmSet ? "green" : "red") + " dot'></span></div>");
 }
 
 void handleAlarmMessage(){
