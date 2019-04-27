@@ -10,6 +10,7 @@
 #include <WiFiUdp.h>
 #include <WiFiClient.h>
 #include <ESP8266WebServer.h>
+#include "Pages.h"
 
 
 ESP8266WebServer server(80);    // Create a webserver object that listens for HTTP request on port 80
@@ -17,8 +18,11 @@ ESP8266WebServer server(80);    // Create a webserver object that listens for HT
 void handleRoot();              // function prototypes for HTTP handlers
 void handleNotFound();
 void handleLogin();
-void handleBudicek();
-void handleMessage();
+void handleSetTime();
+void handleSetMessage();
+void handleAlarm();
+void handleAlarmMessage();
+void handleAlarmOff();
 
 String iHours = "1";
 String iMinutes = "1";
@@ -26,7 +30,8 @@ String iSeconds = "1";
 String iDays = "1";
 String iMonths = "1";
 String iYears = "1";
-
+String aHours = "1";
+String aMinutes = "1";
 
 int intHours = 2;
 int intMinutes = 2;
@@ -34,30 +39,22 @@ int intSeconds = 2;
 int intDays = 2;
 int intMonths = 2;
 int intYears = 2;
-
-String test = "1";
-String test2 = "2";
-int testInt = 1;
-int test2Int = 2;
+int aintHours = 2;
+int aintMinutes = 2;
 
 
-const char ssid[] = "Connectify-me";  //  your network SSID (name)
-const char pass[] = "Regulace60";       // your network password
+bool isNtpSet = false;
+bool isAlarmSet = false;
+
+
+const char ssid[] = "TP-LINK";  //  your network SSID (name)
+const char pass[] = "Regulace150";       // your network password
 
 // NTP Servers:
 static const char ntpServerName[] = "ntp.cesnet.cz";
 //static const char ntpServerName[] = "cz.pool.ntp.org";
-//static const char ntpServerName[] = "time.nist.gov";
-//static const char ntpServerName[] = "time-a.timefreq.bldrdoc.gov";
-//static const char ntpServerName[] = "time-b.timefreq.bldrdoc.gov";
-//static const char ntpServerName[] = "time-c.timefreq.bldrdoc.gov";
 
 const int timeZone = 2;     // Central European Time
-//const int timeZone = -5;  // Eastern Standard Time (USA)
-//const int timeZone = -4;  // Eastern Daylight Time (USA)
-//const int timeZone = -8;  // Pacific Standard Time (USA)
-//const int timeZone = -7;  // Pacific Daylight Time (USA)
-
 
 WiFiUDP Udp;
 unsigned int localPort = 8888;  // local port to listen for UDP packets
@@ -70,9 +67,8 @@ void sendNTPpacket(IPAddress &address);
 void setup()
 {
   Serial.begin(115200);
-  while (!Serial) ; // Needed for Leonardo only
+  //while (!Serial) ; // Needed for Leonardo only
   delay(250);
-  Serial.println("TimeNTP Example");
   Serial.print("Connecting to ");
   Serial.println(ssid);
   WiFi.begin(ssid, pass);
@@ -90,13 +86,16 @@ void setup()
   Serial.println(Udp.localPort());
   Serial.println("waiting for sync");
   setSyncProvider(getNtpTime);
-  setSyncInterval(300);
+  setSyncInterval(600);
 
 
   server.on("/", HTTP_GET, handleRoot);        // Call the 'handleRoot' function when a client requests URI "/"
   server.on("/login", HTTP_POST, handleLogin); // Call the 'handleLogin' function when a POST request is made to URI "/login"
-  server.on("/message",HTTP_POST,handleMessage);
-  server.on("/budicek", HTTP_GET, handleBudicek); // Call the 'handleLogin' function when a POST request is made to URI "/login"
+  server.on("/setmessage",HTTP_POST,handleSetMessage);
+  server.on("/settime", HTTP_GET, handleSetTime); // Call the 'handleLogin' function when a POST request is made to URI "/login"
+  server.on("/alarm", HTTP_GET, handleAlarm); // Call the 'handleLogin' function when a POST request is made to URI "/login"
+  server.on("/alarmmessage",HTTP_POST,handleAlarmMessage);
+  server.on("/alarmoff",HTTP_GET,handleAlarmOff);
   server.onNotFound(handleNotFound);           // When a client requests an unknown URI (i.e. something other than "/"), call function "handleNotFound"
 
   server.begin();                           // Actually start the server
@@ -107,6 +106,7 @@ time_t prevDisplay = 0; // when the digital clock was displayed
 
 void loop()
 {
+  server.handleClient(); 
   if (timeStatus() != timeNotSet) {
     if (now() != prevDisplay) { //update the display only if time has changed
       prevDisplay = now();
@@ -114,7 +114,18 @@ void loop()
     }
   }
 
-  server.handleClient(); 
+  if((hour() == aintHours) && (minute() >= aintMinutes) && (isAlarmSet == true)){
+    Serial.println("Budicek");
+    Serial.println(hour());
+    Serial.println(minute());
+    Serial.println(aintHours);
+    Serial.println(aintMinutes);
+    Serial.println("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!KONEC!!!!!!!!!!!!!!!!!!!!!!!!");
+
+    //if(tl === 1) isAlarmSet = false;
+    if(minute() == aintMinutes + 1)
+      isAlarmSet = false;
+  }
 }
 
 void digitalClockDisplay()
@@ -163,6 +174,8 @@ time_t getNtpTime()
     int size = Udp.parsePacket();
     if (size >= NTP_PACKET_SIZE) {
       Serial.println("Receive NTP Response");
+      isNtpSet = true;
+
       Udp.read(packetBuffer, NTP_PACKET_SIZE);  // read packet into the buffer
       unsigned long secsSince1900;
       // convert four bytes starting at location 40 to a long integer
@@ -173,8 +186,10 @@ time_t getNtpTime()
       return secsSince1900 - 2208988800UL + timeZone * SECS_PER_HOUR;
     }
   }
+
   Serial.println("No NTP Response :-(");
-  return 0; // return 0 if unable to get the time
+  isNtpSet = false;
+  return 0;
 }
 
 // send an NTP request to the time server at the given address
@@ -202,7 +217,8 @@ void sendNTPpacket(IPAddress &address)
 
 
 void handleRoot() {                          // When URI / is requested, send a web page with a button to toggle the LED
-  server.send(200, "text/html", "<form action=\"/login\" method=\"POST\"><input type=\"text\" name=\"username\" placeholder=\"Uzivatel\"></br><input type=\"password\" name=\"password\" placeholder=\"Heslo\"></br><input type=\"submit\" value=\"Login\"></form><p>Zkus 'admin' a heslo 'admin' ...</p>");
+  //server.send(200, "text/html", "<form action=\"/login\" method=\"POST\"><input type=\"text\" name=\"username\" placeholder=\"Uzivatel\"></br><input type=\"password\" name=\"password\" placeholder=\"Heslo\"></br><input type=\"submit\" value=\"Login\"></form><p>Zkus 'admin' a heslo 'admin' ...</p>");
+  server.send(200, "text/html", renderTest(iHours,"nope")) ;
 }
 
 void handleLogin() {                         // If a POST request is made to URI /login
@@ -211,8 +227,9 @@ void handleLogin() {                         // If a POST request is made to URI
     server.send(400, "text/plain", "400: Invalid Request");         // The request is invalid, so send HTTP status 400
     return;
   }
+
   if(server.arg("username") == "admin" && server.arg("password") == "admin") { // If both the username and the password are correct
-    server.send(200, "text/html", "<meta charset='UTF-8'> <h1>Welcome, " + server.arg("username") + "!</h1><p> successful</p>");
+    server.send(200, "text/html", "<meta charset='UTF-8'> <style>.dot{width:16px;height:16px;background-color:gray;border-radius:50%;display:inline-block}.dot.red{background-color:red}.dot.green{background-color:green}</style> <h1>Vítejte " + server.arg("username") + "!</h1><br> Aktualni čas(h,m,s,d,m,r): " + hour() + " :" + minute() + " :" + second() + " :" + day() + " :" + month() + " :" + year() +  "<br> <a href='/settime'><button>Nastavení času</button> </a> <br> <a href='/alarm'><button>Nastavení budíčku</button> </a><div style='position: absolute; right: 64px; top: 20px;'>NTP: <span class='" + (isNtpSet ? "green" : "red") + " dot'></span></div> <div style='position: absolute; right: 64px; top: 40px;'>Budíček: <span class='" + (isAlarmSet ? "green" : "red") + " dot'></span></div>");
   } else {                                                                              // Username and password don't match
     server.send(401, "text/plain", "401: Unauthorized");
   }
@@ -222,8 +239,8 @@ void handleLogin() {                         // If a POST request is made to URI
 
 
 
-void handleBudicek(){
- server.send(200, "text/html", "<meta charset='UTF-8'> <h1>Čas, !</h1><p> Time: " + iHours + " " + iMinutes + " " + iSeconds + " " + iDays + " " + iMonths + " " + iYears + "</p> <a href='/'><button>Go to home</button></a> <form action='/message' method='POST'> h: <input type='text' name='fHours'/> m: <input type='text' name='fMinutes'/>  s: <input type='text' name='fSeconds'/> <br> d: <input type='text' name='fDays'/> m: <input type='text' name='fMonths'/> y: <input type='text' name='fYears'/> <input type='submit' value='Submit'/> </form>");
+void handleSetTime(){
+ server.send(200, "text/html", "<meta charset='UTF-8'> <h1>Čas, !</h1><p> Time: " + iHours + " " + iMinutes + " " + iSeconds + " " + iDays + " " + iMonths + " " + iYears + "</p> <a href='/'><button>Go to home</button></a> <form action='/setmessage' method='POST'> h: <input type='text' name='fHours'/> m: <input type='text' name='fMinutes'/>  s: <input type='text' name='fSeconds'/> <br> d: <input type='text' name='fDays'/> m: <input type='text' name='fMonths'/> y: <input type='text' name='fYears'/> <input type='submit' value='Submit'/> </form>");
 }
 
 void handleNotFound(){
@@ -231,7 +248,7 @@ void handleNotFound(){
 }
 
 
-void handleMessage(){
+void handleSetMessage(){
   if(server.hasArg("fHours") && server.hasArg("fMinutes") && server.hasArg("fSeconds") && server.hasArg("fDays") && server.hasArg("fMonths") && server.hasArg("fYears")){
     iHours = server.arg("fHours");
     iMinutes = server.arg("fMinutes");
@@ -249,6 +266,27 @@ void handleMessage(){
 
     setTime(intHours,intMinutes,intSeconds,intDays,intMonths,intYears);
   }
-  server.send(200, "text/html", "<script type='text/javascript'> window.location = '/budicek'; </script>");
+  server.send(200, "text/html", "<script type='text/javascript'> window.location = '/settime'; </script>");
+}
 
+
+void handleAlarm(){
+ server.send(200, "text/html", "<style>.dot{width:16px;height:16px;background-color:gray;border-radius:50%;display:inline-block}.dot.red{background-color:red}.dot.green{background-color:green}</style> <meta charset='UTF-8'> <h1>Budíček</h1> <p> Alarm: <br>" "h:"+ aHours + "  m:" + aMinutes + "</p> <a href='/'><button>Go to home</button></a> <form action='/alarmoff' method='GET'> <input type='submit' value='Vypnout budík'/> </form> <form action='/alarmmessage' method='POST'> h: <input type='text' name='afHours'/> m: <input type='text' name='afMinutes'/> <input type='submit' value='Nastavit'/> </form> <div style='position: absolute; right: 64px; top: 0px;'>Budíček: <span class='" + (isAlarmSet ? "green" : "red") + " dot'></span></div>");
+}
+
+void handleAlarmMessage(){
+  if(server.hasArg("afHours") && server.hasArg("afMinutes")){
+    aHours = server.arg("afHours");
+    aMinutes = server.arg("afMinutes");
+    aintHours = aHours.toInt();
+    aintMinutes = aHours.toInt();
+    isAlarmSet = true;
+  }
+  
+  server.send(200, "text/html", "<script type='text/javascript'> window.location = '/alarm'; </script>");
+}
+
+void handleAlarmOff(){
+  isAlarmSet = false;
+  server.send(200, "text/html", "<script type='text/javascript'> window.location = '/alarm'; </script>");
 }
