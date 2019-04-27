@@ -284,11 +284,25 @@ void handleSetMessage(){
     intYears = TestParseToInt(iYears);
 
     
+    if((intHours != 999) || (intMinutes != 999) || (intSeconds != 999) || (intDays != 999) || (intMonths != 999) || (intYears != 999))    {
+          
+          if((intHours <= 24) && (intHours >= 0) && (intMinutes >= 0) && (intMinutes <= 60) && (intSeconds >= 0) && (intSeconds <= 60)){
+            if((intDays <= 31) && (intDays > 0) && (intMonths >= 1) && (intMonths <= 12) && (intYears >= 1970)){
+              setTime(intHours,intMinutes,intSeconds,intDays,intMonths,intYears);
+              iHours =    hour();
+              iMinutes =  minute();
+              iSeconds =  second();
+              iDays =     day();
+              iMonths =   month();
+              iYears =    year();
 
-
-    setTime(intHours,intMinutes,intSeconds,intDays,intMonths,intYears);
-  }
-  server.send(200, "text/html", "<script type='text/javascript'> window.location = '/settime'; </script>");
+              server.send(200, "text/html", "<script type='text/javascript'> window.location = '/settime'; </script>");
+              return;
+            }
+          }
+      }
+          server.send(400, "text/html", "<meta charset='UTF-8'> 400: Invalid Request <br> <a href='/settime'><button>Vrátit zpět</button>");
+    }
 }
 
 
