@@ -23,6 +23,7 @@ void handleSetMessage();
 void handleAlarm();
 void handleAlarmMessage();
 void handleAlarmOff();
+int TestParseToInt(String iStr);
 
 String iHours = "1";
 String iMinutes = "1";
@@ -127,6 +128,23 @@ void loop()
       isAlarmSet = false;
   }
 }
+
+int TestParseToInt(String iStr){
+    //int tmpResult = 0;
+    if( (iStr != "0") || (iStr != "00")){
+        if(iStr.toInt() != 0)
+            return iStr.toInt();
+        else
+            return 999;
+    }
+    return 0;
+}
+
+
+
+
+
+
 
 void digitalClockDisplay()
 {
@@ -257,12 +275,16 @@ void handleSetMessage(){
     iMonths = server.arg("fMonths");
     iYears = server.arg("fYears");
 
-    intHours = iHours.toInt();
-    intMinutes = iMinutes.toInt();
-    intSeconds = iSeconds.toInt();
-    intDays = iDays.toInt();
-    intMonths = iMonths.toInt();
-    intYears = iYears.toInt();
+    
+    intHours = TestParseToInt(iHours);
+    intMinutes = TestParseToInt(iMinutes);
+    intSeconds = TestParseToInt(iSeconds);
+    intDays = TestParseToInt(iDays);
+    intMonths = TestParseToInt(iMonths);
+    intYears = TestParseToInt(iYears);
+
+    
+
 
     setTime(intHours,intMinutes,intSeconds,intDays,intMonths,intYears);
   }
@@ -278,9 +300,19 @@ void handleAlarmMessage(){
   if(server.hasArg("afHours") && server.hasArg("afMinutes")){
     aHours = server.arg("afHours");
     aMinutes = server.arg("afMinutes");
-    aintHours = aHours.toInt();
-    aintMinutes = aHours.toInt();
-    isAlarmSet = true;
+
+    aintMinutes = TestParseToInt(aMinutes);
+    aintHours   = TestParseToInt(aHours);
+    
+     if(((aintMinutes != 999) || (aintHours != 999)) && (aintMinutes >= 0) && (aintMinutes <= 60) && (aintHours >= 0) && (aintHours <= 24))    {
+        isAlarmSet = true;
+    }
+    else{
+        isAlarmSet = false;
+        aHours = "0";
+        aMinutes = "0";
+        server.send(400, "text/html", "<meta charset='UTF-8'> 400: Invalid Request <br> <a href='/alarm'><button>Vrátit zpět</button>");
+        }
   }
   
   server.send(200, "text/html", "<script type='text/javascript'> window.location = '/alarm'; </script>");
