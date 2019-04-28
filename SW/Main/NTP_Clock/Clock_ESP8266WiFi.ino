@@ -11,7 +11,7 @@
 #include <WiFiClient.h>
 #include <ESP8266WebServer.h>
 
-
+#define NTPSYNC 600
 
 ESP8266WebServer server(80);    // Create a webserver object that listens for HTTP request on port 80
 
@@ -33,6 +33,9 @@ String iMonths = "1";
 String iYears = "1";
 String aHours = "1";
 String aMinutes = "1";
+String login = "admin1";
+String password = "admin1";
+
 
 int intHours = 2;
 int intMinutes = 2;
@@ -87,7 +90,7 @@ void setup()
   Serial.println(Udp.localPort());
   Serial.println("waiting for sync");
   setSyncProvider(getNtpTime);
-  setSyncInterval(600);
+  setSyncInterval(NTPSYNC);
 
 
   server.on("/", HTTP_GET, handleRoot);        // Call the 'handleRoot' function when a client requests URI "/"
@@ -246,7 +249,7 @@ void handleLogin() {                         // If a POST request is made to URI
     return;
   }
 
-  if(server.arg("username") == "admin" && server.arg("password") == "admin") { // If both the username and the password are correct
+  if(server.arg("username") == login && server.arg("password") == password) { // If both the username and the password are correct
     server.send(200, "text/html", "<meta charset='UTF-8'> <style>.dot{width:16px;height:16px;background-color:gray;border-radius:50%;display:inline-block}.dot.red{background-color:red}.dot.green{background-color:green}</style> <h1>Vítejte " + server.arg("username") + "!</h1><br> Aktualni čas(h,m,s,d,m,r): " + hour() + " :" + minute() + " :" + second() + " :" + day() + " :" + month() + " :" + year() +  "<br> <a href='/settime'><button>Nastavení času</button> </a> <br> <a href='/alarm'><button>Nastavení budíčku</button> </a><div style='position: absolute; right: 64px; top: 20px;'>NTP: <span class='" + (isNtpSet ? "green" : "red") + " dot'></span></div> <div style='position: absolute; right: 64px; top: 40px;'>Budíček: <span class='" + (isAlarmSet ? "green" : "red") + " dot'></span></div>");
   } else {                                                                              // Username and password don't match
     server.send(401, "text/plain", "401: Unauthorized");
