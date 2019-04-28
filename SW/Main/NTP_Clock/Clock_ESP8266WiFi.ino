@@ -11,7 +11,7 @@
 #include <WiFiClient.h>
 #include <ESP8266WebServer.h>
 
-#define NTPSYNC 600
+#define NTPSYNC 180
 
 ESP8266WebServer server(80);    // Create a webserver object that listens for HTTP request on port 80
 
@@ -277,7 +277,7 @@ void handleLogin() {                         // If a POST request is made to URI
   }
 
   if(server.arg("username") == login && server.arg("password") == password) { // If both the username and the password are correct
-    server.send(200, "text/html", "<meta charset='UTF-8'> <style>.dot{width:16px;height:16px;background-color:gray;border-radius:50%;display:inline-block}.dot.red{background-color:red}.dot.green{background-color:green}</style> <h1>Vítejte " + server.arg("username") + "!</h1><br> Aktualni čas(h,m,s,d,m,r): " + hour() + " :" + minute() + " :" + second() + " :" + day() + " :" + month() + " :" + year() +  "<br> <a href='/settime'><button>Nastavení času</button> </a> <br> <a href='/alarm'><button>Nastavení budíčku</button> <br><a href='/chlogin'><button>Změna hesla a účtu</button></a><br><a href='/access'><button>Změna nastavení Wi-Fi</button></a><div style='position: absolute; right: 64px; top: 20px;'>NTP: <span class='" + (isNtpSet ? "green" : "red") + " dot'></span></div> <div style='position: absolute; right: 64px; top: 40px;'>Budíček: <span class='" + (isAlarmSet ? "green" : "red") + " dot'></span></div>");
+    server.send(200, "text/html", "<meta charset='UTF-8'> <style>.dot{width:16px;height:16px;background-color:gray;border-radius:50%;display:inline-block}.dot.red{background-color:red}.dot.green{background-color:green}</style> <h1>Vítejte " + server.arg("username") + "!</h1><br> Aktualni čas(h,m,s,d,m,r): " + hour() + " :" + minute() + " :" + second() + " :" + day() + " :" + month() + " :" + year() +  "<br> <a href='/settime'><button>Nastavení času</button> </a> <br> <a href='/alarm'><button>Nastavení budíčku</button> <br><a href='/chlogin'><button>Změna hesla a účtu</button></a><br><a href='/access'><button>Změna nastavení Wi-Fi</button></a><br><a href='/ntp'><button>Změna NTP serveru</button></a><div style='position: absolute; right: 64px; top: 20px;'>NTP: <span class='" + (isNtpSet ? "green" : "red") + " dot'></span></div> <div style='position: absolute; right: 64px; top: 40px;'>Budíček: <span class='" + (isAlarmSet ? "green" : "red") + " dot'></span></div>");
   } else {                                                                              // Username and password don't match
     server.send(401, "text/plain", "401: Unauthorized");
   }
@@ -406,7 +406,11 @@ void accessMessage(){
 
 
 void NTP(){
+  server.send(200, "text/html", "<meta charset='UTF-8'> <h1>Změna NTP serveru</h1> <br> Současný NTP server: " + ntpServerName + "<br> Pozor na přesnost adresy!  <br> <form action='/ntpmessage' method='POST'> NTP adresa: <input type='text' name='aNTP'/> <input type='submit' value='Nastavit'/> <br> <a href='/'><button>Zpět domů</button></a> </form>");
 }
 void NTPMessage(){
+  if(server.hasArg("aNTP")){
+    ntpServerName = server.arg("aNTP");
+  }
   server.send(200, "text/html", "<script type='text/javascript'> window.location = '/'; </script>");
 };
