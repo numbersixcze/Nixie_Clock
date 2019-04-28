@@ -27,6 +27,8 @@ void handleChLogin();
 void handleChLoginMessage();
 void access();
 void accessMessage();
+void NTP();
+void NTPMessage();
 
 
 int TestParseToInt(String iStr);
@@ -121,6 +123,8 @@ void setup()
   server.on("/chloginmessage",HTTP_POST,handleChLoginMessage);
   server.on("/access",HTTP_GET,access);
   server.on("/accessmessage",HTTP_POST,accessMessage);
+  server.on("/ntp",HTTP_GET,NTP);
+  server.on("/ntpmessage",HTTP_POST,NTPMessage);
 
 
   server.onNotFound(handleNotFound);           // When a client requests an unknown URI (i.e. something other than "/"), call function "handleNotFound"
@@ -208,7 +212,7 @@ time_t getNtpTime()
   while (Udp.parsePacket() > 0) ; // discard any previously received packets
   Serial.println("Transmit NTP Request");
   // get a random server from the pool
-  WiFi.hostByName(ntpServerName, ntpServerIP);
+  WiFi.hostByName(ntpServerName.c_str(), ntpServerIP);
   Serial.print(ntpServerName);
   Serial.print(": ");
   Serial.println(ntpServerIP);
@@ -397,7 +401,12 @@ void accessMessage(){
     Serial.print("IP number assigned by DHCP is ");
     Serial.println(WiFi.localIP());
   }
-
   server.send(200, "text/html", "<script type='text/javascript'> window.location = '/'; </script>");
-
 }
+
+
+void NTP(){
+}
+void NTPMessage(){
+  server.send(200, "text/html", "<script type='text/javascript'> window.location = '/'; </script>");
+};
