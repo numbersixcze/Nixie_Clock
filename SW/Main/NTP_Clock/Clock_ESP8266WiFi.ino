@@ -25,6 +25,9 @@ void handleAlarmMessage();
 void handleAlarmOff();
 void handleChLogin();
 void handleChLoginMessage();
+void access();
+void accessMessage();
+
 
 int TestParseToInt(String iStr);
 
@@ -54,14 +57,25 @@ bool isNtpSet = false;
 bool isAlarmSet = false;
 
 
-const char ssid[] = "TP-LINK";  //  your network SSID (name)
-const char pass[] = "Regulace150";       // your network password
+
+String ssid = "TP-LINK";  //  your network SSID (name)
+String pass = "Regulace150";       // your network password
+
+
 
 // NTP Servers:
-static const char ntpServerName[] = "ntp.cesnet.cz";
+
+/*String ntpSrvrName = "ntp.cesnet.cz";
+char ntpServerName[30];
+ntpSrvrName.toCharArray(ntpServerName,30);*/
+
+
+String ntpServerName = "ntp.cesnet.cz";
+//String ntpServerName = "ntp.cesnet.cz";
 //static const char ntpServerName[] = "cz.pool.ntp.org";
 
-const int timeZone = 2;     // Central European Time
+
+int timeZone = 2;     // Central European Time
 
 WiFiUDP Udp;
 unsigned int localPort = 8888;  // local port to listen for UDP packets
@@ -105,6 +119,10 @@ void setup()
   server.on("/alarmoff",HTTP_GET,handleAlarmOff);
   server.on("/chlogin",HTTP_GET,handleChLogin);
   server.on("/chloginmessage",HTTP_POST,handleChLoginMessage);
+  server.on("/access",HTTP_GET,access);
+  server.on("/accessmessage",HTTP_POST,accessMessage);
+
+
   server.onNotFound(handleNotFound);           // When a client requests an unknown URI (i.e. something other than "/"), call function "handleNotFound"
 
   server.begin();                           // Actually start the server
@@ -255,7 +273,7 @@ void handleLogin() {                         // If a POST request is made to URI
   }
 
   if(server.arg("username") == login && server.arg("password") == password) { // If both the username and the password are correct
-    server.send(200, "text/html", "<meta charset='UTF-8'> <style>.dot{width:16px;height:16px;background-color:gray;border-radius:50%;display:inline-block}.dot.red{background-color:red}.dot.green{background-color:green}</style> <h1>Vítejte " + server.arg("username") + "!</h1><br> Aktualni čas(h,m,s,d,m,r): " + hour() + " :" + minute() + " :" + second() + " :" + day() + " :" + month() + " :" + year() +  "<br> <a href='/settime'><button>Nastavení času</button> </a> <br> <a href='/alarm'><button>Nastavení budíčku</button> <br><a href='/chlogin'><button>Změna hesla a účtu</button></a><div style='position: absolute; right: 64px; top: 20px;'>NTP: <span class='" + (isNtpSet ? "green" : "red") + " dot'></span></div> <div style='position: absolute; right: 64px; top: 40px;'>Budíček: <span class='" + (isAlarmSet ? "green" : "red") + " dot'></span></div>");
+    server.send(200, "text/html", "<meta charset='UTF-8'> <style>.dot{width:16px;height:16px;background-color:gray;border-radius:50%;display:inline-block}.dot.red{background-color:red}.dot.green{background-color:green}</style> <h1>Vítejte " + server.arg("username") + "!</h1><br> Aktualni čas(h,m,s,d,m,r): " + hour() + " :" + minute() + " :" + second() + " :" + day() + " :" + month() + " :" + year() +  "<br> <a href='/settime'><button>Nastavení času</button> </a> <br> <a href='/alarm'><button>Nastavení budíčku</button> <br><a href='/chlogin'><button>Změna hesla a účtu</button></a><br><a href='/access'><button>Změna nastavení Wi-Fi</button></a><div style='position: absolute; right: 64px; top: 20px;'>NTP: <span class='" + (isNtpSet ? "green" : "red") + " dot'></span></div> <div style='position: absolute; right: 64px; top: 40px;'>Budíček: <span class='" + (isAlarmSet ? "green" : "red") + " dot'></span></div>");
   } else {                                                                              // Username and password don't match
     server.send(401, "text/plain", "401: Unauthorized");
   }
@@ -356,4 +374,30 @@ void handleChLoginMessage(){
     password = server.arg("aPassword");
   }
   server.send(200, "text/html", "<script type='text/javascript'> window.location = '/'; </script>");
+}
+
+
+void access(){
+  server.send(200, "text/html", "<meta charset='UTF-8'> <h1>Změna hesla a názvu Wi-Fi</h1> <br> <a href='/'><button>Zpět domů</button></a> <br> <form action='/accessmessage' method='POST'> účet: <input type='text' name='aSSID'/> heslo: <input type='text' name='aPasw'/> <input type='submit' value='Nastavit'/> </form>");
+}
+void accessMessage(){
+  if(server.hasArg("aSSID") && server.hasArg("aPasw")){
+    String tmpLogin = server.arg("aSSID");
+    String tmpPassword = server.arg("aPasw");
+
+    Serial.print("Connecting to ");
+    Serial.println(tmpLogin);
+    WiFi.begin(tmpLogin, tmpPassword);
+
+    while (WiFi.status() != WL_CONNECTED) {
+      delay(500);
+      Serial.print(".");
+    }
+
+    Serial.print("IP number assigned by DHCP is ");
+    Serial.println(WiFi.localIP());
+  }
+
+  server.send(200, "text/html", "<script type='text/javascript'> window.location = '/'; </script>");
+
 }
