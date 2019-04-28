@@ -3,8 +3,8 @@
 struct SystemData {
   char ssid[20];
   char passwordW[20];
-  char login[15];
-  char password[15];
+  char login[20];
+  char password[20];
 };
 
 void setup(){
