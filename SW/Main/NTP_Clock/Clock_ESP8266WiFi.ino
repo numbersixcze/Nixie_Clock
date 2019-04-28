@@ -67,13 +67,7 @@ String pass = "Regulace150";       // your network password
 
 // NTP Servers:
 
-/*String ntpSrvrName = "ntp.cesnet.cz";
-char ntpServerName[30];
-ntpSrvrName.toCharArray(ntpServerName,30);*/
-
-
 String ntpServerName = "ntp.cesnet.cz";
-//String ntpServerName = "ntp.cesnet.cz";
 //static const char ntpServerName[] = "cz.pool.ntp.org";
 
 
@@ -406,11 +400,22 @@ void accessMessage(){
 
 
 void NTP(){
-  server.send(200, "text/html", "<meta charset='UTF-8'> <h1>Změna NTP serveru</h1> <br> Současný NTP server: " + ntpServerName + "<br> Pozor na přesnost adresy!  <br> <form action='/ntpmessage' method='POST'> NTP adresa: <input type='text' name='aNTP'/> <input type='submit' value='Nastavit'/> <br> <a href='/'><button>Zpět domů</button></a> </form>");
+  server.send(200, "text/html", "<meta charset='UTF-8'> <h1>Změna NTP serveru</h1> <br> Současný NTP server: " + ntpServerName + "<br> Časová zóna: " + timeZone + "<br> Pozor na přesnost adresy!  <br> <form action='/ntpmessage' method='POST'> NTP adresa: <input type='text' name='aNTP'/> <br> Časová zóna (ČR = 2) <input type='number' name='aTzone' min='-10' max='10'/> <input type='submit' value='Nastavit'/> <br> <a href='/'><button>Zpět domů</button></a> </form>");
 }
+
 void NTPMessage(){
-  if(server.hasArg("aNTP")){
-    ntpServerName = server.arg("aNTP");
+  if(server.hasArg("aNTP") && server.hasArg("aTzone")){
+    if(server.arg("aNTP") != NULL){
+      ntpServerName = server.arg("aNTP");
+      if(TestParseToInt(server.arg("aTzone"))!= 999)
+      {
+        if((timeZone >= -10) && (timeZone <=10)){
+            timeZone = TestParseToInt(server.arg("aTzone"));
+            server.send(200, "text/html", "<script type='text/javascript'> window.location = '/'; </script>");
+            return;
+            }
+      }
+    }
+    server.send(400, "text/html", "<meta charset='UTF-8'> 400: Invalid Request <br> <a href='/ntp'><button>Vrátit zpět</button>");
   }
-  server.send(200, "text/html", "<script type='text/javascript'> window.location = '/'; </script>");
 };
