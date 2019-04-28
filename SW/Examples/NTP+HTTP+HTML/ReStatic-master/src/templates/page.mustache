@@ -1,0 +1,17 @@
+<!DOCTYPE HTML>
+<html>
+    <head>
+        <meta charset="UTF-8">
+    </head>
+    <body>
+        {{content}}
+
+        {{#styles}}
+            <style>{{{.}}}</style>
+        {{/styles}}
+
+        {{#scripts}}
+            <script type="text/javascript">{{{.}}}</script>
+        {{/scripts}}
+    </body>
+</html>

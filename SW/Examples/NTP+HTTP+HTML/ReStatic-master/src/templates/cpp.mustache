@@ -1,0 +1,9 @@
+#include <Arduino.h>
+#include "Pages.h"
+
+{{#pages}}
+String render{{name}}({{variables}}) {
+    return {{{content}}};
+}
+
+{{/pages}}
