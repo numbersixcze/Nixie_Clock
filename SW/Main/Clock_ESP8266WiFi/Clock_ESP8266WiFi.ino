@@ -20,10 +20,10 @@ void handleAlarmOff();
 void handleChLogin();
 void handleLogout();
 void handleChLoginMessage();
-void access();
-void accessMessage();
-void NTP();
-void NTPMessage();
+void handleAccess();
+void handleAccessMessage();
+void handleNTP();
+void handleNTPMessage();
 
 int TestParseToInt(String iStr);
 
@@ -61,9 +61,6 @@ String pass = "Regulace150";       // your network password
 // NTP Servers:
 String ntpServerName = "ntp.cesnet.cz";
 //static const char ntpServerName[] = "cz.pool.ntp.org";  //Nahradni DNS server
-
-
-
 
 WiFiUDP Udp;
 unsigned int localPort = 8888;  // local port to listen for UDP packets
@@ -107,10 +104,10 @@ void setup()
   server.on("/alarmoff",HTTP_GET,handleAlarmOff);
   server.on("/chlogin",HTTP_GET,handleChLogin);
   server.on("/chloginmessage",HTTP_POST,handleChLoginMessage);
-  server.on("/access",HTTP_GET,access);
-  server.on("/accessmessage",HTTP_POST,accessMessage);
-  server.on("/ntp",HTTP_GET,NTP);
-  server.on("/ntpmessage",HTTP_POST,NTPMessage);
+  server.on("/access",HTTP_GET,handleAccess);
+  server.on("/accessmessage",HTTP_POST,handleAccessMessage);
+  server.on("/ntp",HTTP_GET,handleNTP);
+  server.on("/ntpmessage",HTTP_POST,handleNTPMessage);
   server.on("/main",HTTP_GET,handleMain);
   server.on("/logout",HTTP_GET,handleLogout);
 
@@ -253,15 +250,13 @@ void handleRoot() {                          // When URI / is requested, send a 
 void handleLogin() {                         // If a POST request is made to URI /login
   if( ! server.hasArg("username") || ! server.hasArg("password") 
       || server.arg("username") == NULL || server.arg("password") == NULL) { // If the POST request doesn't have username and password data
-    server.send(400, "text/plain", "400: Invalid Request");         // The request is invalid, so send HTTP status 400
-    //return;
+    server.send(401, "text/html", "<meta charset='UTF-8'> 401: Neplatný požadavek<br> <a href='/'><button>Vrátit zpět</button>");
+    return;
   }
-  ///Doplnit http-equiv='refresh' content='5'
     tmpLogin      = server.arg("username");
     tmpPassword   = server.arg("password");
 
     if(tmpLogin == login && tmpPassword == password){
-          //server.send(200, "text/html", "<meta charset='UTF-8'> <style>.dot{width:16px;height:16px;background-color:gray;border-radius:50%;display:inline-block}.dot.red{background-color:red}.dot.green{background-color:green}</style> <h1>Vítejte " + tmpLogin + tmpPassword + server.arg("username") + "!</h1><br> Aktualni čas(h,m,s,d,m,r): " + hour() + " :" + minute() + " :" + second() + " :" + day() + " :" + month() + " :" + year() +  "<br> <a href='/settime'><button>Nastavení času</button> </a> <br> <a href='/alarm'><button>Nastavení budíčku</button> <br><a href='/chlogin'><button>Změna hesla a účtu</button></a><br><a href='/access'><button>Změna nastavení Wi-Fi</button></a><br><a href='/ntp'><button>Změna NTP serveru</button></a><div style='position: absolute; right: 64px; top: 20px;'>NTP: <span class='" + (isNtpSet ? "green" : "red") + " dot'></span></div> <div style='position: absolute; right: 64px; top: 40px;'>Budíček: <span class='" + (isAlarmSet ? "green" : "red") + " dot'></span></div>");
       server.send(200, "text/html", "<script type='text/javascript'> window.location = '/main'; </script>");
     }
     else{
@@ -282,20 +277,23 @@ void handleSetTime(){
   iDays    =     day();
   iMonths  =   month();
   iYears   =    year(); 
-  server.send(200, "text/html", "<meta charset='UTF-8' http-equiv='refresh' content='1'> <h1>Čas, !</h1><p> Time: <br>(h,m,s) " + iHours + " :" + iMinutes + " :" + iSeconds + "<br> (d,m,r) " + iDays + " ." + iMonths + " ." + iYears + "</p> <a href='/'><button>Zpět domů</button></a> <form action='/setmessage' method='POST'> h: <input type='number' min='0' max='23' name='fHours'/> m: <input type='number' min='0' max='59' name='fMinutes'/>  s: <input type='number' min='0' max='59' name='fSeconds'/> <br> d: <input type='number' min='1' max='31' name='fDays'/> m: <input type='number' min='1' max='12' name='fMonths'/> r: <input type='number' min='1970' name='fYears'/> <input type='submit' value='Odeslat'/> </form>");
-}
 
-void handleNotFound(){
-  server.send(404, "text/plain", "404: Not found"); // Send HTTP status 404 (Not Found) when there's no handler for the URI in the request
-}
-
-void handleMain(){
   if(tmpLogin == login && tmpPassword == password){
-    server.send(200, "text/html", "<meta charset='UTF-8' http-equiv='refresh' content='1'> <style>.dot{width:16px;height:16px;background-color:gray;border-radius:50%;display:inline-block}.dot.red{background-color:red}.dot.green{background-color:green}</style> <h1>Vítejte " + server.arg("username") + "!</h1><br> Aktualni čas(h,m,s,d,m,r): " + hour() + " :" + minute() + " :" + second() + " :" + day() + " :" + month() + " :" + year() +  "<br> <a href='/settime'><button>Nastavení času</button> </a> <br> <a href='/alarm'><button>Nastavení budíčku</button> <br> <a href='/chlogin'><button>Změna hesla a účtu</button></a><br><a href='/access'><button>Změna nastavení Wi-Fi</button></a><br><a href='/ntp'><button>Změna NTP serveru</button></a> <br> <a href='/logout'><button>Odhlásit</button></a><div style='position: absolute; right: 64px; top: 20px;'>NTP: <span class='" + (isNtpSet ? "green" : "red") + " dot'></span></div> <div style='position: absolute; right: 64px; top: 40px;'>Budíček: <span class='" + (isAlarmSet ? "green" : "red") + " dot'></span></div>");
+    server.send(200, "text/html", "<meta charset='UTF-8'> <h1>Nastavení času</h1><p> Čas: <br>(h,m,s) " + iHours + " :" + iMinutes + " :" + iSeconds + "<br> (d,m,r) " + iDays + " ." + iMonths + " ." + iYears + "</p> <a href='/'><button>Zpět domů</button></a> <form action='/setmessage' method='POST'> h: <input type='number' min='0' max='23' name='fHours'/> m: <input type='number' min='0' max='59' name='fMinutes'/>  s: <input type='number' min='0' max='59' name='fSeconds'/> <br> d: <input type='number' min='1' max='31' name='fDays'/> m: <input type='number' min='1' max='12' name='fMonths'/> r: <input type='number' min='1970' name='fYears'/> <input type='submit' value='Odeslat'/> </form>");
   }
   server.send(401, "text/html", "<meta charset='UTF-8'> 401: Neautorizován <br> <a href='/'><button>Vrátit zpět</button>");
 }
 
+void handleNotFound(){
+  server.send(404, "text/plain", "404: Stránka nenalezena"); // Send HTTP status 404 (Not Found) when there's no handler for the URI in the request
+}
+
+void handleMain(){
+  if(tmpLogin == login && tmpPassword == password){
+    server.send(200, "text/html", "<meta charset='UTF-8' http-equiv='refresh' content='1'> <style>.dot{width:16px;height:16px;background-color:gray;border-radius:50%;display:inline-block}.dot.red{background-color:red}.dot.green{background-color:green}</style> <h1>Vítejte " + tmpLogin + "!</h1><br> Aktualni čas(h,m,s,d,m,r): " + hour() + " :" + minute() + " :" + second() + " :" + day() + " :" + month() + " :" + year() +  "<br> <a href='/settime'><button>Nastavení času</button> </a> <br> <a href='/alarm'><button>Nastavení budíčku</button> <br> <a href='/chlogin'><button>Změna hesla a účtu</button></a><br><a href='/access'><button>Změna nastavení Wi-Fi</button></a><br><a href='/ntp'><button>Změna NTP serveru</button></a> <br> <a href='/logout'><button>Odhlásit</button></a><div style='position: absolute; right: 64px; top: 20px;'>NTP: <span class='" + (isNtpSet ? "green" : "red") + " dot'></span></div> <div style='position: absolute; right: 64px; top: 40px;'>Budíček: <span class='" + (isAlarmSet ? "green" : "red") + " dot'></span></div>");
+  }
+  server.send(401, "text/html", "<meta charset='UTF-8'> 401: Neautorizován <br> <a href='/'><button>Vrátit zpět</button>");
+}
 
 void handleSetMessage(){
   if(server.hasArg("fHours") && server.hasArg("fMinutes") && server.hasArg("fSeconds") && server.hasArg("fDays") && server.hasArg("fMonths") && server.hasArg("fYears")){
@@ -324,7 +322,10 @@ void handleSetMessage(){
 
 
 void handleAlarm(){
- server.send(200, "text/html", "<style>.dot{width:16px;height:16px;background-color:gray;border-radius:50%;display:inline-block}.dot.red{background-color:red}.dot.green{background-color:green}</style> <meta charset='UTF-8'> <h1>Budíček</h1> <p> Alarm: <br>" "h:"+ aHours + "  m:" + aMinutes + "</p> <a href='/'><button>Zpět domů</button></a> <form action='/alarmoff' method='GET'> <input type='submit' value='Vypnout budík'/> </form> <form action='/alarmmessage' method='POST'> h: <input type='number' min='0' max='23' name='afHours'/> m: <input type='number' min='0' max='59' name='afMinutes'/> <input type='submit' value='Nastavit'/> </form> <div style='position: absolute; right: 64px; top: 0px;'>Budíček: <span class='" + (isAlarmSet ? "green" : "red") + " dot'></span></div>");
+  if(tmpLogin == login && tmpPassword == password){
+    server.send(200, "text/html", "<style>.dot{width:16px;height:16px;background-color:gray;border-radius:50%;display:inline-block}.dot.red{background-color:red}.dot.green{background-color:green}</style> <meta charset='UTF-8'> <h1>Budíček</h1> <p> Alarm: <br>" "h:"+ aHours + "  m:" + aMinutes + "</p> <a href='/'><button>Zpět domů</button></a> <form action='/alarmoff' method='GET'> <input type='submit' value='Vypnout budík'/> </form> <form action='/alarmmessage' method='POST'> h: <input type='number' min='0' max='23' name='afHours'/> m: <input type='number' min='0' max='59' name='afMinutes'/> <input type='submit' value='Nastavit'/> </form> <div style='position: absolute; right: 64px; top: 0px;'>Budíček: <span class='" + (isAlarmSet ? "green" : "red") + " dot'></span></div>");
+  }
+ server.send(401, "text/html", "<meta charset='UTF-8'> 401: Neautorizován <br> <a href='/'><button>Vrátit zpět</button>");
 }
 
 void handleAlarmMessage(){
@@ -369,10 +370,15 @@ void handleChLoginMessage(){
 }
 
 
-void access(){
-  server.send(200, "text/html", "<meta charset='UTF-8'> <h1>Změna hesla a názvu Wi-Fi</h1> <br> <a href='/'><button>Zpět domů</button></a> <br> <form action='/accessmessage' method='POST'> účet: <input type='text' name='aSSID'/> heslo: <input type='text' name='aPasw'/> <input type='submit' value='Nastavit'/> </form>");
+void handleAccess(){
+  if(tmpLogin == login && tmpPassword == password){
+    server.send(200, "text/html", "<meta charset='UTF-8'> <h1>Změna hesla a názvu Wi-Fi</h1> <br> <a href='/'><button>Zpět domů</button></a> <br> <form action='/accessmessage' method='POST'> účet: <input type='text' name='aSSID'/> heslo: <input type='text' name='aPasw'/> <input type='submit' value='Nastavit'/> </form>");
+    return;
+  }
+  server.send(401, "text/html", "<meta charset='UTF-8'> 401: Neautorizován <br> <a href='/'><button>Vrátit zpět</button>");
 }
-void accessMessage(){
+
+void handleAccessMessage(){
   if(server.hasArg("aSSID") && server.hasArg("aPasw")){
     String tmpLogin = server.arg("aSSID");
     String tmpPassword = server.arg("aPasw");
@@ -393,21 +399,22 @@ void accessMessage(){
 }
 
 
-void NTP(){
-  server.send(200, "text/html", "<meta charset='UTF-8'> <h1>Změna NTP serveru</h1> <br> Současný NTP server: " + ntpServerName + "<br> Časová zóna: " + timeZone + "<br> Pozor na přesnost adresy!  <br> <form action='/ntpmessage' method='POST'> NTP adresa: <input type='text' name='aNTP'/> <br> Časová zóna (ČR = 2) <input type='number' name='aTzone' min='-10' max='10'/> <input type='submit' value='Nastavit'/> <br> <a href='/'><button>Zpět domů</button></a> </form>");
+void handleNTP(){
+    if(tmpLogin == login && tmpPassword == password){
+        server.send(200, "text/html", "<meta charset='UTF-8'> <h1>Změna NTP serveru</h1> <br> Současný NTP server: " + ntpServerName + "<br> Časová zóna: " + timeZone + "<br> Pozor na přesnost adresy!  <br> <form action='/ntpmessage' method='POST'> NTP adresa: <input type='text' name='aNTP'/> <br> Časová zóna (ČR = 2) <input type='number' name='aTzone' min='-10' max='10'/> <input type='submit' value='Nastavit'/> <br> <a href='/'><button>Zpět domů</button></a> </form>");
+    }
+    server.send(401, "text/html", "<meta charset='UTF-8'> 401: Neautorizován <br> <a href='/'><button>Vrátit zpět</button>");
 }
 
-void NTPMessage(){
+void handleNTPMessage(){
   if(server.hasArg("aNTP") && server.hasArg("aTzone")){
     if(server.arg("aNTP") != NULL){
       ntpServerName = server.arg("aNTP");
       if(TestParseToInt(server.arg("aTzone"))!= 999)
       {
-        if((timeZone >= -10) && (timeZone <=10)){
             timeZone = TestParseToInt(server.arg("aTzone"));
             server.send(200, "text/html", "<script type='text/javascript'> window.location = '/'; </script>");
             return;
-            }
       }
     }
     server.send(400, "text/html", "<meta charset='UTF-8'> 400: Invalid Request <br> <a href='/ntp'><button>Vrátit zpět</button>");
