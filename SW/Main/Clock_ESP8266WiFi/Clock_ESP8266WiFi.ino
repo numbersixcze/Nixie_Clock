@@ -9,6 +9,7 @@
 ESP8266WebServer server(80);    // Create a webserver object that listens for HTTP request on port 80
 
 void handleRoot();              // function prototypes for HTTP handlers
+void handleMain();
 void handleNotFound();
 void handleLogin();
 void handleSetTime();
@@ -17,6 +18,7 @@ void handleAlarm();
 void handleAlarmMessage();
 void handleAlarmOff();
 void handleChLogin();
+void handleLogout();
 void handleChLoginMessage();
 void access();
 void accessMessage();
@@ -35,6 +37,9 @@ String aHours = "1";
 String aMinutes = "1";
 String login = "admin";
 String password = "admin";
+String tmpLogin = "";
+String tmpPassword = "";
+
 
 int intHours = 2;
 int intMinutes = 2;
@@ -106,6 +111,8 @@ void setup()
   server.on("/accessmessage",HTTP_POST,accessMessage);
   server.on("/ntp",HTTP_GET,NTP);
   server.on("/ntpmessage",HTTP_POST,NTPMessage);
+  server.on("/main",HTTP_GET,handleMain);
+  server.on("/logout",HTTP_GET,handleLogout);
 
 
   server.onNotFound(handleNotFound);           // When a client requests an unknown URI (i.e. something other than "/"), call function "handleNotFound"
@@ -247,14 +254,25 @@ void handleLogin() {                         // If a POST request is made to URI
   if( ! server.hasArg("username") || ! server.hasArg("password") 
       || server.arg("username") == NULL || server.arg("password") == NULL) { // If the POST request doesn't have username and password data
     server.send(400, "text/plain", "400: Invalid Request");         // The request is invalid, so send HTTP status 400
-    return;
+    //return;
   }
   ///Doplnit http-equiv='refresh' content='5'
-  if(server.arg("username") == login && server.arg("password") == password) { // If both the username and the password are correct
-    server.send(200, "text/html", "<meta charset='UTF-8'> <style>.dot{width:16px;height:16px;background-color:gray;border-radius:50%;display:inline-block}.dot.red{background-color:red}.dot.green{background-color:green}</style> <h1>Vítejte " + server.arg("username") + "!</h1><br> Aktualni čas(h,m,s,d,m,r): " + hour() + " :" + minute() + " :" + second() + " :" + day() + " :" + month() + " :" + year() +  "<br> <a href='/settime'><button>Nastavení času</button> </a> <br> <a href='/alarm'><button>Nastavení budíčku</button> <br><a href='/chlogin'><button>Změna hesla a účtu</button></a><br><a href='/access'><button>Změna nastavení Wi-Fi</button></a><br><a href='/ntp'><button>Změna NTP serveru</button></a><div style='position: absolute; right: 64px; top: 20px;'>NTP: <span class='" + (isNtpSet ? "green" : "red") + " dot'></span></div> <div style='position: absolute; right: 64px; top: 40px;'>Budíček: <span class='" + (isAlarmSet ? "green" : "red") + " dot'></span></div>");
-  } else {                                                                              // Username and password don't match
-    server.send(401, "text/plain", "401: Unauthorized");
-  }
+    tmpLogin      = server.arg("username");
+    tmpPassword   = server.arg("password");
+
+    if(tmpLogin == login && tmpPassword == password){
+          //server.send(200, "text/html", "<meta charset='UTF-8'> <style>.dot{width:16px;height:16px;background-color:gray;border-radius:50%;display:inline-block}.dot.red{background-color:red}.dot.green{background-color:green}</style> <h1>Vítejte " + tmpLogin + tmpPassword + server.arg("username") + "!</h1><br> Aktualni čas(h,m,s,d,m,r): " + hour() + " :" + minute() + " :" + second() + " :" + day() + " :" + month() + " :" + year() +  "<br> <a href='/settime'><button>Nastavení času</button> </a> <br> <a href='/alarm'><button>Nastavení budíčku</button> <br><a href='/chlogin'><button>Změna hesla a účtu</button></a><br><a href='/access'><button>Změna nastavení Wi-Fi</button></a><br><a href='/ntp'><button>Změna NTP serveru</button></a><div style='position: absolute; right: 64px; top: 20px;'>NTP: <span class='" + (isNtpSet ? "green" : "red") + " dot'></span></div> <div style='position: absolute; right: 64px; top: 40px;'>Budíček: <span class='" + (isAlarmSet ? "green" : "red") + " dot'></span></div>");
+      server.send(200, "text/html", "<script type='text/javascript'> window.location = '/main'; </script>");
+    }
+    else{
+      server.send(401, "text/html", "<meta charset='UTF-8'> 401: Neautorizován <br> <a href='/'><button>Vrátit zpět</button>");
+    }
+}
+
+void handleLogout(){
+    tmpLogin      = "";
+    tmpPassword   = "";
+      server.send(200, "text/html", "<meta charset='UTF-8'> <h1>Odhlášení provedeno</h1> <br> <a href='/'><button>Zpět domů</button></a>");
 }
 
 void handleSetTime(){
@@ -269,6 +287,13 @@ void handleSetTime(){
 
 void handleNotFound(){
   server.send(404, "text/plain", "404: Not found"); // Send HTTP status 404 (Not Found) when there's no handler for the URI in the request
+}
+
+void handleMain(){
+  if(tmpLogin == login && tmpPassword == password){
+    server.send(200, "text/html", "<meta charset='UTF-8' http-equiv='refresh' content='1'> <style>.dot{width:16px;height:16px;background-color:gray;border-radius:50%;display:inline-block}.dot.red{background-color:red}.dot.green{background-color:green}</style> <h1>Vítejte " + server.arg("username") + "!</h1><br> Aktualni čas(h,m,s,d,m,r): " + hour() + " :" + minute() + " :" + second() + " :" + day() + " :" + month() + " :" + year() +  "<br> <a href='/settime'><button>Nastavení času</button> </a> <br> <a href='/alarm'><button>Nastavení budíčku</button> <br> <a href='/chlogin'><button>Změna hesla a účtu</button></a><br><a href='/access'><button>Změna nastavení Wi-Fi</button></a><br><a href='/ntp'><button>Změna NTP serveru</button></a> <br> <a href='/logout'><button>Odhlásit</button></a><div style='position: absolute; right: 64px; top: 20px;'>NTP: <span class='" + (isNtpSet ? "green" : "red") + " dot'></span></div> <div style='position: absolute; right: 64px; top: 40px;'>Budíček: <span class='" + (isAlarmSet ? "green" : "red") + " dot'></span></div>");
+  }
+  server.send(401, "text/html", "<meta charset='UTF-8'> 401: Neautorizován <br> <a href='/'><button>Vrátit zpět</button>");
 }
 
 
