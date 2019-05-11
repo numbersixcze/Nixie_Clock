@@ -79,6 +79,15 @@ void setup()
   Serial.println(ssid);
   WiFi.begin(ssid, pass);
 
+  //Manual set IP
+  
+ /* 
+  IPAddress ip(192,168,1,205);   
+  IPAddress gateway(192,168,1,1);   
+  IPAddress subnet(255,255,255,0);   
+  WiFi.config(ip, gateway, subnet);
+  */
+
   while (WiFi.status() != WL_CONNECTED) {
     delay(500);
     Serial.print(".");
