@@ -79,6 +79,15 @@ void setup()
   Serial.println(ssid);
   WiFi.begin(ssid, pass);
 
+  //Manual set IP
+
+  /*
+  IPAddress ip(192,168,1,205);   
+  IPAddress gateway(192,168,1,1);   
+  IPAddress subnet(255,255,255,0);   
+  WiFi.config(ip, gateway, subnet);
+  */
+
   while (WiFi.status() != WL_CONNECTED) {
     delay(500);
     Serial.print(".");
@@ -113,7 +122,6 @@ void setup()
 
 
   server.onNotFound(handleNotFound);           // When a client requests an unknown URI (i.e. something other than "/"), call function "handleNotFound"
-
   server.begin();                           // Actually start the server
   Serial.println("HTTP server started");
 }
@@ -267,7 +275,7 @@ void handleLogin() {                         // If a POST request is made to URI
 void handleLogout(){
     tmpLogin      = "";
     tmpPassword   = "";
-      server.send(200, "text/html", "<meta charset='UTF-8'> <h1>Odhlášení provedeno</h1> <br> <a href='/'><button>Zpět domů</button></a>");
+    server.send(200, "text/html", "<meta charset='UTF-8'> <h1>Odhlášení provedeno</h1> <br> <a href='/'><button>Zpět domů</button></a>");
 }
 
 void handleSetTime(){
@@ -279,13 +287,13 @@ void handleSetTime(){
   iYears   =    year(); 
 
   if(tmpLogin == login && tmpPassword == password){
-    server.send(200, "text/html", "<meta charset='UTF-8'> <h1>Nastavení času</h1><p> Čas: <br>(h,m,s) " + iHours + " :" + iMinutes + " :" + iSeconds + "<br> (d,m,r) " + iDays + " ." + iMonths + " ." + iYears + "</p> <a href='/'><button>Zpět domů</button></a> <form action='/setmessage' method='POST'> h: <input type='number' min='0' max='23' name='fHours'/> m: <input type='number' min='0' max='59' name='fMinutes'/>  s: <input type='number' min='0' max='59' name='fSeconds'/> <br> d: <input type='number' min='1' max='31' name='fDays'/> m: <input type='number' min='1' max='12' name='fMonths'/> r: <input type='number' min='1970' name='fYears'/> <input type='submit' value='Odeslat'/> </form>");
+    server.send(200, "text/html", "<meta charset='UTF-8'> <h1>Nastavení času</h1><p> Čas: <br>(h,m,s) " + iHours + " :" + iMinutes + " :" + iSeconds + "<br> (d,m,r) " + iDays + " ." + iMonths + " ." + iYears + "</p> <a href='/main'><button>Zpět domů</button></a> <form action='/setmessage' method='POST'> h: <input type='number' min='0' max='23' name='fHours'/> m: <input type='number' min='0' max='59' name='fMinutes'/>  s: <input type='number' min='0' max='59' name='fSeconds'/> <br> d: <input type='number' min='1' max='31' name='fDays'/> m: <input type='number' min='1' max='12' name='fMonths'/> r: <input type='number' min='1970' name='fYears'/> <input type='submit' value='Odeslat'/> </form>");
   }
   server.send(401, "text/html", "<meta charset='UTF-8'> 401: Neautorizován <br> <a href='/'><button>Vrátit zpět</button>");
 }
 
 void handleNotFound(){
-  server.send(404, "text/plain", "404: Stránka nenalezena"); // Send HTTP status 404 (Not Found) when there's no handler for the URI in the request
+  server.send(404, "text/html", "<meta charset='UTF-8'> 404: Stránka nenalezena"); // Send HTTP status 404 (Not Found) when there's no handler for the URI in the request
 }
 
 void handleMain(){
@@ -323,9 +331,9 @@ void handleSetMessage(){
 
 void handleAlarm(){
   if(tmpLogin == login && tmpPassword == password){
-    server.send(200, "text/html", "<style>.dot{width:16px;height:16px;background-color:gray;border-radius:50%;display:inline-block}.dot.red{background-color:red}.dot.green{background-color:green}</style> <meta charset='UTF-8'> <h1>Budíček</h1> <p> Alarm: <br>" "h:"+ aHours + "  m:" + aMinutes + "</p> <a href='/'><button>Zpět domů</button></a> <form action='/alarmoff' method='GET'> <input type='submit' value='Vypnout budík'/> </form> <form action='/alarmmessage' method='POST'> h: <input type='number' min='0' max='23' name='afHours'/> m: <input type='number' min='0' max='59' name='afMinutes'/> <input type='submit' value='Nastavit'/> </form> <div style='position: absolute; right: 64px; top: 0px;'>Budíček: <span class='" + (isAlarmSet ? "green" : "red") + " dot'></span></div>");
+    server.send(200, "text/html", "<style>.dot{width:16px;height:16px;background-color:gray;border-radius:50%;display:inline-block}.dot.red{background-color:red}.dot.green{background-color:green}</style> <meta charset='UTF-8'> <h1>Budíček</h1> <p> Alarm: <br>" "h:"+ aHours + "  m:" + aMinutes + "</p> <a href='/main'><button>Zpět domů</button></a> <form action='/alarmoff' method='GET'> <input type='submit' value='Vypnout budík'/> </form> <form action='/alarmmessage' method='POST'> h: <input type='number' min='0' max='23' name='afHours'/> m: <input type='number' min='0' max='59' name='afMinutes'/> <input type='submit' value='Nastavit'/> </form> <div style='position: absolute; right: 64px; top: 0px;'>Budíček: <span class='" + (isAlarmSet ? "green" : "red") + " dot'></span></div>");
   }
- server.send(401, "text/html", "<meta charset='UTF-8'> 401: Neautorizován <br> <a href='/'><button>Vrátit zpět</button>");
+  server.send(401, "text/html", "<meta charset='UTF-8'> 401: Neautorizován <br> <a href='/'><button>Vrátit zpět</button>");
 }
 
 void handleAlarmMessage(){
@@ -336,7 +344,7 @@ void handleAlarmMessage(){
     aintMinutes = TestParseToInt(aMinutes);
     aintHours   = TestParseToInt(aHours);
     
-     if((aintMinutes != 999) || (aintHours != 999)) {
+    if((aintMinutes != 999) || (aintHours != 999)) {
         isAlarmSet = true;
     }
     else{
@@ -357,7 +365,7 @@ void handleAlarmOff(){
 
 
 void handleChLogin(){
-  server.send(200, "text/html", "<meta charset='UTF-8'> <h1>Změna hesla a název účtu</h1> <br> <a href='/'><button>Zpět domů</button></a> <br> <form action='/chloginmessage' method='POST'> účet: <input type='text' name='aLogin'/> heslo: <input type='text' name='aPassword'/> <input type='submit' value='Nastavit'/> </form>");
+  server.send(200, "text/html", "<meta charset='UTF-8'> <h1>Změna hesla a název účtu</h1> <br> <a href='/main'><button>Zpět domů</button></a> <br> <form action='/chloginmessage' method='POST'> účet: <input type='text' name='aLogin'/> heslo: <input type='text' name='aPassword'/> <input type='submit' value='Nastavit'/> </form>");
 }
 
 
@@ -372,7 +380,7 @@ void handleChLoginMessage(){
 
 void handleAccess(){
   if(tmpLogin == login && tmpPassword == password){
-    server.send(200, "text/html", "<meta charset='UTF-8'> <h1>Změna hesla a názvu Wi-Fi</h1> <br> <a href='/'><button>Zpět domů</button></a> <br> <form action='/accessmessage' method='POST'> účet: <input type='text' name='aSSID'/> heslo: <input type='text' name='aPasw'/> <input type='submit' value='Nastavit'/> </form>");
+    server.send(200, "text/html", "<meta charset='UTF-8'> <h1>Změna hesla a názvu Wi-Fi</h1> <br> <a href='/main'><button>Zpět domů</button></a> <br> <form action='/accessmessage' method='POST'> účet: <input type='text' name='aSSID'/> heslo: <input type='text' name='aPasw'/> <input type='submit' value='Nastavit'/> </form>");
     return;
   }
   server.send(401, "text/html", "<meta charset='UTF-8'> 401: Neautorizován <br> <a href='/'><button>Vrátit zpět</button>");
@@ -401,7 +409,7 @@ void handleAccessMessage(){
 
 void handleNTP(){
     if(tmpLogin == login && tmpPassword == password){
-        server.send(200, "text/html", "<meta charset='UTF-8'> <h1>Změna NTP serveru</h1> <br> Současný NTP server: " + ntpServerName + "<br> Časová zóna: " + timeZone + "<br> Pozor na přesnost adresy!  <br> <form action='/ntpmessage' method='POST'> NTP adresa: <input type='text' name='aNTP'/> <br> Časová zóna (ČR = 2) <input type='number' name='aTzone' min='-10' max='10'/> <input type='submit' value='Nastavit'/> <br> <a href='/'><button>Zpět domů</button></a> </form>");
+        server.send(200, "text/html", "<meta charset='UTF-8'> <h1>Změna NTP serveru</h1> <br> Současný NTP server: " + ntpServerName + "<br> Časová zóna: " + timeZone + "<br> Pozor na přesnost adresy!  <br> <form action='/ntpmessage' method='POST'> NTP adresa: <input type='text' name='aNTP'/> <br> Časová zóna (ČR = 2) <input type='number' name='aTzone' min='-10' max='10'/> <input type='submit' value='Nastavit'/></form> <br> <a href='/main'><button>Zpět domů</button></a>");
     }
     server.send(401, "text/html", "<meta charset='UTF-8'> 401: Neautorizován <br> <a href='/'><button>Vrátit zpět</button>");
 }
