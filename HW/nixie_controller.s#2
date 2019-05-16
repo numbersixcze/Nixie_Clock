@@ -27741,9 +27741,9 @@ vypínací 3A
 </segment>
 <segment>
 <pinref part="GND87" gate="1" pin="GND"/>
-<pinref part="JP1" gate="A" pin="1"/>
-<wire x1="66.04" y1="35.56" x2="76.2" y2="35.56" width="0.1524" layer="91"/>
-<wire x1="76.2" y1="30.48" x2="76.2" y2="35.56" width="0.1524" layer="91"/>
+<wire x1="76.2" y1="30.48" x2="76.2" y2="38.1" width="0.1524" layer="91"/>
+<pinref part="JP1" gate="A" pin="2"/>
+<wire x1="66.04" y1="38.1" x2="76.2" y2="38.1" width="0.1524" layer="91"/>
 </segment>
 <segment>
 <pinref part="C41" gate="G$1" pin="1"/>
@@ -28048,9 +28048,9 @@ vypínací 3A
 </net>
 <net name="EXT_MCU" class="0">
 <segment>
-<wire x1="66.04" y1="38.1" x2="78.74" y2="38.1" width="0.1524" layer="91"/>
-<pinref part="JP1" gate="A" pin="2"/>
-<label x="78.74" y="38.1" size="1.778" layer="95" xref="yes"/>
+<wire x1="66.04" y1="35.56" x2="81.28" y2="35.56" width="0.1524" layer="91"/>
+<label x="81.28" y="35.56" size="1.778" layer="95" xref="yes"/>
+<pinref part="JP1" gate="A" pin="1"/>
 </segment>
 </net>
 <net name="N$2" class="0">

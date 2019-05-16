@@ -24812,7 +24812,7 @@ Based on the following sources:
 <attribute name="VALUE" x="75.692" y="213.868" size="1.778" layer="96"/>
 </instance>
 <instance part="P+25" gate="1" x="129.54" y="76.2" smashed="yes" rot="R270">
-<attribute name="VALUE" x="132.334" y="74.422" size="1.778" layer="96" rot="R90"/>
+<attribute name="VALUE" x="130.302" y="75.946" size="1.778" layer="96"/>
 </instance>
 <instance part="P+26" gate="1" x="208.28" y="111.76" smashed="yes">
 <attribute name="VALUE" x="210.058" y="114.554" size="1.778" layer="96" rot="R180"/>
