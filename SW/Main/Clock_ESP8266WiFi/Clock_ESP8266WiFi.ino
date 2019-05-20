@@ -308,7 +308,7 @@ void handleSetTime(){
   iYears   =    year(); 
 
   if(tmpLogin == login && tmpPassword == password){
-    server.send(200, "text/html", "<meta charset='UTF-8'> <h1>Nastavení času</h1><p> Čas: <br>(h,m,s) " + iHours + " :" + iMinutes + " :" + iSeconds + "<br> (d,m,r) " + iDays + "." + iMonths + "." + iYears + "</p> <a href='/main'><button>Zpět domů</button></a> <form action='/setmessage' method='POST'> h: <input type='number' min='0' max='23' name='fHours'/> m: <input type='number' min='0' max='59' name='fMinutes'/>  s: <input type='number' min='0' max='59' name='fSeconds'/> <br> d: <input type='number' min='1' max='31' name='fDays'/> m: <input type='number' min='1' max='12' name='fMonths'/> r: <input type='number' min='1970' name='fYears'/> <input type='submit' value='Odeslat'/> </form>");
+    server.send(200, "text/html", "<meta charset='UTF-8'> <h1>Nastavení času</h1><p> Čas: <br>(h,m,s) " + iHours + ":" + iMinutes + ":" + iSeconds + "<br> (d,m,r) " + iDays + "." + iMonths + "." + iYears + "</p> <a href='/main'><button>Zpět domů</button></a> <form action='/setmessage' method='POST'> h: <input type='number' min='0' max='23' name='fHours'/> m: <input type='number' min='0' max='59' name='fMinutes'/>  s: <input type='number' min='0' max='59' name='fSeconds'/> <br> d: <input type='number' min='1' max='31' name='fDays'/> m: <input type='number' min='1' max='12' name='fMonths'/> r: <input type='number' min='1970' name='fYears'/> <input type='submit' value='Odeslat'/> </form>");
   }
   server.send(401, "text/html", "<meta charset='UTF-8'> 401: Neautorizován <br> <a href='/'><button>Vrátit zpět</button>");
 }
@@ -319,34 +319,37 @@ void handleNotFound(){
 
 void handleMain(){
   if(tmpLogin == login && tmpPassword == password){
-    server.send(200, "text/html", "<meta charset='UTF-8' http-equiv='refresh' content='1'> <style>.dot{width:16px;height:16px;background-color:gray;border-radius:50%;display:inline-block}.dot.red{background-color:red}.dot.green{background-color:green}</style> <h1>Vítejte " + tmpLogin + "!</h1><br> Aktualni čas(h,m,s,d,m,r): " + hour() + " :" + minute() + " :" + second() + " :" + day() + " :" + month() + " :" + year() +  "<br> <a href='/settime'><button>Nastavení času</button> </a> <br> <a href='/alarm'><button>Nastavení budíčku</button> <br> <a href='/chlogin'><button>Změna hesla a účtu</button></a><br><a href='/access'><button>Změna nastavení Wi-Fi</button></a><br><a href='/ntp'><button>Změna NTP serveru</button></a> <br> <a href='/logout'><button>Odhlásit</button></a><div style='position: absolute; right: 64px; top: 20px;'>NTP: <span class='" + (isNtpSet ? "green" : "red") + " dot'></span></div> <div style='position: absolute; right: 64px; top: 40px;'>Budíček: <span class='" + (isAlarmSet ? "green" : "red") + " dot'></span></div>");
+    server.send(200, "text/html", "<meta charset='UTF-8' http-equiv='refresh' content='1'> <style>.dot{width:16px;height:16px;background-color:gray;border-radius:50%;display:inline-block}.dot.red{background-color:red}.dot.green{background-color:green}</style> <h1>Vítejte " + tmpLogin + "!</h1><br> Aktualni čas(h,m,s,d,m,r): " + hour() + ":" + minute() + ":" + second() + ": " + day() + "." + month() + "." + year() +  "<br> <a href='/settime'><button>Nastavení času</button> </a> <br> <a href='/alarm'><button>Nastavení budíčku</button> <br> <a href='/chlogin'><button>Změna hesla a účtu</button></a><br><a href='/access'><button>Změna nastavení Wi-Fi</button></a><br><a href='/ntp'><button>Změna NTP serveru</button></a> <br> <a href='/logout'><button>Odhlásit</button></a><div style='position: absolute; right: 64px; top: 20px;'>NTP: <span class='" + (isNtpSet ? "green" : "red") + " dot'></span></div> <div style='position: absolute; right: 64px; top: 40px;'>Budíček: <span class='" + (isAlarmSet ? "green" : "red") + " dot'></span></div>");
   }
   server.send(401, "text/html", "<meta charset='UTF-8'> 401: Neautorizován <br> <a href='/'><button>Vrátit zpět</button>");
 }
 
 void handleSetMessage(){
-  if(server.hasArg("fHours") && server.hasArg("fMinutes") && server.hasArg("fSeconds") && server.hasArg("fDays") && server.hasArg("fMonths") && server.hasArg("fYears")){
-    iHours = server.arg("fHours");
-    iMinutes = server.arg("fMinutes");
-    iSeconds = server.arg("fSeconds");
-    iDays = server.arg("fDays");
-    iMonths = server.arg("fMonths");
-    iYears = server.arg("fYears");
-    
-    intHours = TestParseToInt(iHours);
-    intMinutes = TestParseToInt(iMinutes);
-    intSeconds = TestParseToInt(iSeconds);
-    intDays = TestParseToInt(iDays);
-    intMonths = TestParseToInt(iMonths);
-    intYears = TestParseToInt(iYears);
-    
-    if((intHours != 999) || (intMinutes != 999) || (intSeconds != 999) || (intDays != 999) || (intMonths != 999) || (intYears != 999))    {
-      setTime(intHours,intMinutes,intSeconds,intDays,intMonths,intYears);
-      server.send(200, "text/html", "<script type='text/javascript'> window.location = '/settime'; </script>");
-      return;
+  if(tmpLogin == login && tmpPassword == password){
+    if(server.hasArg("fHours") && server.hasArg("fMinutes") && server.hasArg("fSeconds") && server.hasArg("fDays") && server.hasArg("fMonths") && server.hasArg("fYears")){
+      iHours = server.arg("fHours");
+      iMinutes = server.arg("fMinutes");
+      iSeconds = server.arg("fSeconds");
+      iDays = server.arg("fDays");
+      iMonths = server.arg("fMonths");
+      iYears = server.arg("fYears");
+      
+      intHours = TestParseToInt(iHours);
+      intMinutes = TestParseToInt(iMinutes);
+      intSeconds = TestParseToInt(iSeconds);
+      intDays = TestParseToInt(iDays);
+      intMonths = TestParseToInt(iMonths);
+      intYears = TestParseToInt(iYears);
+      
+      if((intHours != 999) || (intMinutes != 999) || (intSeconds != 999) || (intDays != 999) || (intMonths != 999) || (intYears != 999))    {
+        setTime(intHours,intMinutes,intSeconds,intDays,intMonths,intYears);
+        server.send(200, "text/html", "<script type='text/javascript'> window.location = '/settime'; </script>");
+        return;
+        }
+      server.send(400, "text/html", "<meta charset='UTF-8'> 400: Invalid Request <br> <a href='/settime'><button>Vrátit zpět</button>");
       }
-    server.send(400, "text/html", "<meta charset='UTF-8'> 400: Invalid Request <br> <a href='/settime'><button>Vrátit zpět</button>");
-    }
+  }
+  server.send(401, "text/html", "<meta charset='UTF-8'> 401: Neautorizován <br> <a href='/'><button>Vrátit zpět</button>");
 }
 
 
@@ -358,44 +361,55 @@ void handleAlarm(){
 }
 
 void handleAlarmMessage(){
-  if(server.hasArg("afHours") && server.hasArg("afMinutes")){
-    aHours = server.arg("afHours");
-    aMinutes = server.arg("afMinutes");
+  if(tmpLogin == login && tmpPassword == password){
+    if(server.hasArg("afHours") && server.hasArg("afMinutes")){
+      aHours = server.arg("afHours");
+      aMinutes = server.arg("afMinutes");
 
-    aintMinutes = TestParseToInt(aMinutes);
-    aintHours   = TestParseToInt(aHours);
-    
-    if((aintMinutes != 999) || (aintHours != 999)) {
-        isAlarmSet = true;
+      aintMinutes = TestParseToInt(aMinutes);
+      aintHours   = TestParseToInt(aHours);
+      
+      if((aintMinutes != 999) || (aintHours != 999)) {
+          isAlarmSet = true;
+      }
+      else{
+          isAlarmSet = false;
+          aHours = "0";
+          aMinutes = "0";
+          server.send(400, "text/html", "<meta charset='UTF-8'> 400: Invalid Request <br> <a href='/alarm'><button>Vrátit zpět</button>");
+          }
     }
-    else{
-        isAlarmSet = false;
-        aHours = "0";
-        aMinutes = "0";
-        server.send(400, "text/html", "<meta charset='UTF-8'> 400: Invalid Request <br> <a href='/alarm'><button>Vrátit zpět</button>");
-        }
+    server.send(200, "text/html", "<script type='text/javascript'> window.location = '/alarm'; </script>");
   }
-  
-  server.send(200, "text/html", "<script type='text/javascript'> window.location = '/alarm'; </script>");
+  server.send(401, "text/html", "<meta charset='UTF-8'> 401: Neautorizován <br> <a href='/'><button>Vrátit zpět</button>");
 }
 
 void handleAlarmOff(){
-  isAlarmSet = false;
-  server.send(200, "text/html", "<script type='text/javascript'> window.location = '/alarm'; </script>");
+  if(tmpLogin == login && tmpPassword == password){
+    isAlarmSet = false;
+    server.send(200, "text/html", "<script type='text/javascript'> window.location = '/alarm'; </script>");
+  }
+  server.send(401, "text/html", "<meta charset='UTF-8'> 401: Neautorizován <br> <a href='/'><button>Vrátit zpět</button>");
 }
 
 
 void handleChLogin(){
-  server.send(200, "text/html", "<meta charset='UTF-8'> <h1>Změna hesla a název účtu</h1> <br> <a href='/main'><button>Zpět domů</button></a> <br> <form action='/chloginmessage' method='POST'> účet: <input type='text' name='aLogin'/> heslo: <input type='text' name='aPassword'/> <input type='submit' value='Nastavit'/> </form>");
+  if(tmpLogin == login && tmpPassword == password){
+    server.send(200, "text/html", "<meta charset='UTF-8'> <h1>Změna hesla a název účtu</h1> <br> <a href='/main'><button>Zpět domů</button></a> <br> <form action='/chloginmessage' method='POST'> účet: <input type='text' name='aLogin'/> heslo: <input type='text' name='aPassword'/> <input type='submit' value='Nastavit'/> </form>");
+  }
+  server.send(401, "text/html", "<meta charset='UTF-8'> 401: Neautorizován <br> <a href='/'><button>Vrátit zpět</button>");
 }
 
 
 void handleChLoginMessage(){
-  if(server.hasArg("aLogin") && server.hasArg("aPassword")){
-    login = server.arg("aLogin");
-    password = server.arg("aPassword");
+  if(tmpLogin == login && tmpPassword == password){
+    if(server.hasArg("aLogin") && server.hasArg("aPassword")){
+      login = server.arg("aLogin");
+      password = server.arg("aPassword");
+    }
+    server.send(200, "text/html", "<script type='text/javascript'> window.location = '/'; </script>");
   }
-  server.send(200, "text/html", "<script type='text/javascript'> window.location = '/'; </script>");
+  server.send(401, "text/html", "<meta charset='UTF-8'> 401: Neautorizován <br> <a href='/'><button>Vrátit zpět</button>");
 }
 
 
@@ -408,23 +422,26 @@ void handleAccess(){
 }
 
 void handleAccessMessage(){
-  if(server.hasArg("aSSID") && server.hasArg("aPasw")){
-    String tmpLogin = server.arg("aSSID");
-    String tmpPassword = server.arg("aPasw");
+  if(tmpLogin == login && tmpPassword == password){
+    if(server.hasArg("aSSID") && server.hasArg("aPasw")){
+      String tmpLogin = server.arg("aSSID");
+      String tmpPassword = server.arg("aPasw");
 
-    Serial.print("Connecting to ");
-    Serial.println(tmpLogin);
-    WiFi.begin(tmpLogin, tmpPassword);
+      Serial.print("Connecting to ");
+      Serial.println(tmpLogin);
+      WiFi.begin(tmpLogin, tmpPassword);
 
-    while (WiFi.status() != WL_CONNECTED) {
-      delay(500);
-      Serial.print(".");
+      while (WiFi.status() != WL_CONNECTED) {
+        delay(500);
+        Serial.print(".");
+      }
+
+      Serial.print("IP number assigned by DHCP is ");
+      Serial.println(WiFi.localIP());
     }
-
-    Serial.print("IP number assigned by DHCP is ");
-    Serial.println(WiFi.localIP());
+    server.send(200, "text/html", "<script type='text/javascript'> window.location = '/main'; </script>");
   }
-  server.send(200, "text/html", "<script type='text/javascript'> window.location = '/main'; </script>");
+  server.send(401, "text/html", "<meta charset='UTF-8'> 401: Neautorizován <br> <a href='/'><button>Vrátit zpět</button>");
 }
 
 
@@ -436,16 +453,19 @@ void handleNTP(){
 }
 
 void handleNTPMessage(){
-  if(server.hasArg("aNTP") && server.hasArg("aTzone")){
-    if(server.arg("aNTP") != NULL){
-      ntpServerName = server.arg("aNTP");
-      if(TestParseToInt(server.arg("aTzone"))!= 999)
-      {
-            timeZone = TestParseToInt(server.arg("aTzone"));
-            server.send(200, "text/html", "<script type='text/javascript'> window.location = '/ntp'; </script>");
-            return;
+  if(tmpLogin == login && tmpPassword == password){
+    if(server.hasArg("aNTP") && server.hasArg("aTzone")){
+      if(server.arg("aNTP") != NULL){
+        ntpServerName = server.arg("aNTP");
+        if(TestParseToInt(server.arg("aTzone"))!= 999)
+        {
+              timeZone = TestParseToInt(server.arg("aTzone"));
+              server.send(200, "text/html", "<script type='text/javascript'> window.location = '/ntp'; </script>");
+              return;
+        }
       }
+      server.send(400, "text/html", "<meta charset='UTF-8'> 400: Invalid Request <br> <a href='/ntp'><button>Vrátit zpět</button>");
     }
-    server.send(400, "text/html", "<meta charset='UTF-8'> 400: Invalid Request <br> <a href='/ntp'><button>Vrátit zpět</button>");
   }
+  server.send(401, "text/html", "<meta charset='UTF-8'> 401: Neautorizován <br> <a href='/'><button>Vrátit zpět</button>");
 };
