@@ -1,10 +1,12 @@
 #include <TimeLib.h>
 #include <ESP8266WiFi.h>
 #include <WiFiUdp.h>
+#include <ESP8266mDNS.h>
 //#include <WiFiClient.h>
 #include <ESP8266WebServer.h>
 
 #define NTPSYNC 180
+#define NAMESERVER "alarm"
 
 ESP8266WebServer server(80);    // Create a webserver object that listens for HTTP request on port 80
 
@@ -124,12 +126,31 @@ void setup()
   server.onNotFound(handleNotFound);           // When a client requests an unknown URI (i.e. something other than "/"), call function "handleNotFound"
   server.begin();                           // Actually start the server
   Serial.println("HTTP server started");
+
+  //Nastaveni mDNS
+  if (!MDNS.begin(NAMESERVER)) {
+      Serial.println("Error setting up MDNS responder!");
+      while (1) {
+        delay(1000);
+      }
+    }
+    Serial.println("mDNS responder started");
+
+    // Add service to MDNS-SD
+    MDNS.addService("http", "tcp", 80);
+
+
 }
+
+
 
 time_t prevDisplay = 0; // when the digital clock was displayed
 
 void loop()
 {
+
+  MDNS.update();
+
   server.handleClient(); 
   if (timeStatus() != timeNotSet) {
     if (now() != prevDisplay) { //update the display only if time has changed
@@ -287,7 +308,7 @@ void handleSetTime(){
   iYears   =    year(); 
 
   if(tmpLogin == login && tmpPassword == password){
-    server.send(200, "text/html", "<meta charset='UTF-8'> <h1>Nastavení času</h1><p> Čas: <br>(h,m,s) " + iHours + " :" + iMinutes + " :" + iSeconds + "<br> (d,m,r) " + iDays + " ." + iMonths + " ." + iYears + "</p> <a href='/main'><button>Zpět domů</button></a> <form action='/setmessage' method='POST'> h: <input type='number' min='0' max='23' name='fHours'/> m: <input type='number' min='0' max='59' name='fMinutes'/>  s: <input type='number' min='0' max='59' name='fSeconds'/> <br> d: <input type='number' min='1' max='31' name='fDays'/> m: <input type='number' min='1' max='12' name='fMonths'/> r: <input type='number' min='1970' name='fYears'/> <input type='submit' value='Odeslat'/> </form>");
+    server.send(200, "text/html", "<meta charset='UTF-8'> <h1>Nastavení času</h1><p> Čas: <br>(h,m,s) " + iHours + " :" + iMinutes + " :" + iSeconds + "<br> (d,m,r) " + iDays + "." + iMonths + "." + iYears + "</p> <a href='/main'><button>Zpět domů</button></a> <form action='/setmessage' method='POST'> h: <input type='number' min='0' max='23' name='fHours'/> m: <input type='number' min='0' max='59' name='fMinutes'/>  s: <input type='number' min='0' max='59' name='fSeconds'/> <br> d: <input type='number' min='1' max='31' name='fDays'/> m: <input type='number' min='1' max='12' name='fMonths'/> r: <input type='number' min='1970' name='fYears'/> <input type='submit' value='Odeslat'/> </form>");
   }
   server.send(401, "text/html", "<meta charset='UTF-8'> 401: Neautorizován <br> <a href='/'><button>Vrátit zpět</button>");
 }
@@ -403,7 +424,7 @@ void handleAccessMessage(){
     Serial.print("IP number assigned by DHCP is ");
     Serial.println(WiFi.localIP());
   }
-  server.send(200, "text/html", "<script type='text/javascript'> window.location = '/'; </script>");
+  server.send(200, "text/html", "<script type='text/javascript'> window.location = '/main'; </script>");
 }
 
 
@@ -421,7 +442,7 @@ void handleNTPMessage(){
       if(TestParseToInt(server.arg("aTzone"))!= 999)
       {
             timeZone = TestParseToInt(server.arg("aTzone"));
-            server.send(200, "text/html", "<script type='text/javascript'> window.location = '/'; </script>");
+            server.send(200, "text/html", "<script type='text/javascript'> window.location = '/ntp'; </script>");
             return;
       }
     }
