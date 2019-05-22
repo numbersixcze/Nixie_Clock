@@ -4449,42 +4449,42 @@ Source: www.kingbright.com</description>
 <text x="-3.25" y="-1.25" size="1.27" layer="27">&gt;VALUE</text>
 </package>
 <package name="ZM1040.SOCKET">
-<circle x="0" y="0" radius="3.5" width="0.127" layer="21"/>
-<circle x="0" y="0" radius="14.5" width="0.127" layer="21"/>
-<circle x="0" y="0" radius="3.5" width="0.127" layer="21"/>
-<circle x="0" y="0" radius="14.5" width="0.127" layer="21"/>
-<pad name="IC" x="0" y="-10.5" drill="2" rot="R180"/>
-<pad name="K5" x="-8.2" y="-6.55" drill="2" rot="R180"/>
-<pad name="K4" x="-10.25" y="-2.35" drill="2" rot="R180"/>
-<pad name="K3" x="-10.25" y="2.35" drill="2" rot="R180"/>
-<pad name="K2" x="-8.2" y="6.55" drill="2" rot="R180"/>
-<pad name="A" x="0" y="10.5" drill="2" rot="R180"/>
-<pad name="A1" x="4.55" y="9.45" drill="2" rot="R180"/>
-<pad name="K0" x="8.2" y="6.55" drill="2" rot="R180"/>
-<pad name="K1" x="10.25" y="2.35" drill="2" rot="R180"/>
-<pad name="K9" x="10.25" y="-2.35" drill="2" rot="R180"/>
-<pad name="K8" x="8.2" y="-6.55" drill="2" rot="R180"/>
-<pad name="K7" x="4.55" y="-9.45" drill="2" rot="R180"/>
-<pad name="K6" x="-4.55" y="-9.45" drill="2" rot="R180"/>
-<wire x1="0" y1="-14.5" x2="-1" y2="-15.5" width="0.127" layer="21"/>
-<wire x1="-1" y1="-15.5" x2="0" y2="-15.5" width="0.127" layer="21"/>
-<wire x1="0" y1="-15.5" x2="1" y2="-15.5" width="0.127" layer="21"/>
-<wire x1="1" y1="-15.5" x2="0" y2="-14.5" width="0.127" layer="21"/>
-<wire x1="0" y1="-14.5" x2="0" y2="-15.5" width="0.127" layer="21"/>
-<circle x="-5.85" y="1.35" radius="0.50249375" width="0.127" layer="21"/>
-<circle x="-4.7" y="3.75" radius="0.50249375" width="0.127" layer="21"/>
-<circle x="-2.6" y="5.4" radius="0.50249375" width="0.127" layer="21"/>
-<circle x="0" y="6" radius="0.50249375" width="0.127" layer="21"/>
-<circle x="2.6" y="5.4" radius="0.50249375" width="0.127" layer="21"/>
-<circle x="4.7" y="3.75" radius="0.50249375" width="0.127" layer="21"/>
-<circle x="5.85" y="1.35" radius="0.50249375" width="0.127" layer="21"/>
-<circle x="5.85" y="-1.35" radius="0.50249375" width="0.127" layer="21"/>
-<circle x="4.7" y="-3.75" radius="0.50249375" width="0.127" layer="21"/>
-<circle x="2.6" y="-5.4" radius="0.50249375" width="0.127" layer="21"/>
-<circle x="0" y="-6" radius="0.50249375" width="0.127" layer="21"/>
-<circle x="-2.6" y="-5.4" radius="0.50249375" width="0.127" layer="21"/>
-<circle x="-4.7" y="-3.75" radius="0.50249375" width="0.127" layer="21"/>
-<circle x="-5.85" y="-1.35" radius="0.50249375" width="0.127" layer="21"/>
+<circle x="0" y="0" radius="3.5" width="0.127" layer="22"/>
+<circle x="0" y="0" radius="14.5" width="0.127" layer="22"/>
+<circle x="0" y="0" radius="3.5" width="0.127" layer="22"/>
+<circle x="0" y="0" radius="14.5" width="0.127" layer="22"/>
+<pad name="IC" x="0" y="-10.5" drill="2"/>
+<pad name="K5" x="8.2" y="-6.55" drill="2"/>
+<pad name="K4" x="10.25" y="-2.35" drill="2"/>
+<pad name="K3" x="10.25" y="2.35" drill="2"/>
+<pad name="K2" x="8.2" y="6.55" drill="2"/>
+<pad name="A" x="0" y="10.5" drill="2"/>
+<pad name="A1" x="-4.55" y="9.45" drill="2"/>
+<pad name="K1" x="-8.2" y="6.55" drill="2"/>
+<pad name="K0" x="-10.25" y="2.35" drill="2"/>
+<pad name="K9" x="-10.25" y="-2.35" drill="2"/>
+<pad name="K8" x="-8.2" y="-6.55" drill="2"/>
+<pad name="K7" x="-4.55" y="-9.45" drill="2"/>
+<pad name="K6" x="4.55" y="-9.45" drill="2"/>
+<wire x1="0" y1="-14.5" x2="1" y2="-15.5" width="0.127" layer="22"/>
+<wire x1="1" y1="-15.5" x2="0" y2="-15.5" width="0.127" layer="22"/>
+<wire x1="0" y1="-15.5" x2="-1" y2="-15.5" width="0.127" layer="22"/>
+<wire x1="-1" y1="-15.5" x2="0" y2="-14.5" width="0.127" layer="22"/>
+<wire x1="0" y1="-14.5" x2="0" y2="-15.5" width="0.127" layer="22"/>
+<circle x="5.85" y="1.35" radius="0.50249375" width="0.127" layer="22"/>
+<circle x="4.7" y="3.75" radius="0.50249375" width="0.127" layer="22"/>
+<circle x="2.6" y="5.4" radius="0.50249375" width="0.127" layer="22"/>
+<circle x="0" y="6" radius="0.50249375" width="0.127" layer="22"/>
+<circle x="-2.6" y="5.4" radius="0.50249375" width="0.127" layer="22"/>
+<circle x="-4.7" y="3.75" radius="0.50249375" width="0.127" layer="22"/>
+<circle x="-5.85" y="1.35" radius="0.50249375" width="0.127" layer="22"/>
+<circle x="-5.85" y="-1.35" radius="0.50249375" width="0.127" layer="22"/>
+<circle x="-4.7" y="-3.75" radius="0.50249375" width="0.127" layer="22"/>
+<circle x="-2.6" y="-5.4" radius="0.50249375" width="0.127" layer="22"/>
+<circle x="0" y="-6" radius="0.50249375" width="0.127" layer="22"/>
+<circle x="2.6" y="-5.4" radius="0.50249375" width="0.127" layer="22"/>
+<circle x="4.7" y="-3.75" radius="0.50249375" width="0.127" layer="22"/>
+<circle x="5.85" y="-1.35" radius="0.50249375" width="0.127" layer="22"/>
 <text x="7.62" y="15.24" size="1.27" layer="21">&gt;NAME</text>
 <text x="7.62" y="12.7" size="1.27" layer="21">&gt;VALUE</text>
 </package>
@@ -4623,8 +4623,8 @@ Source: www.kingbright.com</description>
 </device>
 <device name="-SOCKET_ELRADO" package="ZM1040.SOCKET">
 <connects>
-<connect gate="G$1" pin="0" pad="K0"/>
-<connect gate="G$1" pin="1" pad="K1"/>
+<connect gate="G$1" pin="0" pad="K1"/>
+<connect gate="G$1" pin="1" pad="K0"/>
 <connect gate="G$1" pin="2" pad="K2"/>
 <connect gate="G$1" pin="3" pad="K3"/>
 <connect gate="G$1" pin="4" pad="K4"/>
@@ -4702,8 +4702,8 @@ Source: www.kingbright.com</description>
 <instance part="5V1" gate="VCC" x="119.38" y="121.92"/>
 <instance part="LED1" gate="G$1" x="96.52" y="78.74"/>
 <instance part="LED2" gate="G$1" x="83.82" y="78.74"/>
-<instance part="AN1" gate="G$1" x="215.9" y="15.24" rot="MR90"/>
-<instance part="AN2" gate="G$1" x="215.9" y="-20.32" rot="MR90"/>
+<instance part="AN1" gate="G$1" x="215.9" y="-20.32" rot="MR90"/>
+<instance part="AN2" gate="G$1" x="215.9" y="15.24" rot="MR90"/>
 <instance part="AN3" gate="G$1" x="215.9" y="53.34" rot="MR90"/>
 <instance part="AN4" gate="G$1" x="215.9" y="88.9" rot="MR90"/>
 </instances>
@@ -4784,140 +4784,140 @@ Source: www.kingbright.com</description>
 <segment>
 <wire x1="208.28" y1="-10.16" x2="195.58" y2="-10.16" width="0.1524" layer="91"/>
 <pinref part="IC4" gate="A" pin="1"/>
-<pinref part="AN2" gate="G$1" pin="1"/>
+<pinref part="AN1" gate="G$1" pin="1"/>
 </segment>
 </net>
 <net name="N$12" class="0">
 <segment>
 <wire x1="208.28" y1="-12.7" x2="195.58" y2="-12.7" width="0.1524" layer="91"/>
 <pinref part="IC4" gate="A" pin="2"/>
-<pinref part="AN2" gate="G$1" pin="2"/>
+<pinref part="AN1" gate="G$1" pin="2"/>
 </segment>
 </net>
 <net name="N$13" class="0">
 <segment>
 <wire x1="208.28" y1="-17.78" x2="195.58" y2="-17.78" width="0.1524" layer="91"/>
 <pinref part="IC4" gate="A" pin="4"/>
-<pinref part="AN2" gate="G$1" pin="4"/>
+<pinref part="AN1" gate="G$1" pin="4"/>
 </segment>
 </net>
 <net name="N$14" class="0">
 <segment>
 <wire x1="208.28" y1="-15.24" x2="195.58" y2="-15.24" width="0.1524" layer="91"/>
 <pinref part="IC4" gate="A" pin="3"/>
-<pinref part="AN2" gate="G$1" pin="3"/>
+<pinref part="AN1" gate="G$1" pin="3"/>
 </segment>
 </net>
 <net name="N$15" class="0">
 <segment>
 <wire x1="208.28" y1="-20.32" x2="195.58" y2="-20.32" width="0.1524" layer="91"/>
 <pinref part="IC4" gate="A" pin="5"/>
-<pinref part="AN2" gate="G$1" pin="5"/>
+<pinref part="AN1" gate="G$1" pin="5"/>
 </segment>
 </net>
 <net name="N$16" class="0">
 <segment>
 <wire x1="208.28" y1="-22.86" x2="195.58" y2="-22.86" width="0.1524" layer="91"/>
 <pinref part="IC4" gate="A" pin="6"/>
-<pinref part="AN2" gate="G$1" pin="6"/>
+<pinref part="AN1" gate="G$1" pin="6"/>
 </segment>
 </net>
 <net name="N$17" class="0">
 <segment>
 <wire x1="208.28" y1="-25.4" x2="195.58" y2="-25.4" width="0.1524" layer="91"/>
 <pinref part="IC4" gate="A" pin="7"/>
-<pinref part="AN2" gate="G$1" pin="7"/>
+<pinref part="AN1" gate="G$1" pin="7"/>
 </segment>
 </net>
 <net name="N$18" class="0">
 <segment>
 <wire x1="208.28" y1="-27.94" x2="195.58" y2="-27.94" width="0.1524" layer="91"/>
 <pinref part="IC4" gate="A" pin="8"/>
-<pinref part="AN2" gate="G$1" pin="8"/>
+<pinref part="AN1" gate="G$1" pin="8"/>
 </segment>
 </net>
 <net name="N$19" class="0">
 <segment>
 <wire x1="208.28" y1="-30.48" x2="195.58" y2="-30.48" width="0.1524" layer="91"/>
 <pinref part="IC4" gate="A" pin="9"/>
-<pinref part="AN2" gate="G$1" pin="9"/>
+<pinref part="AN1" gate="G$1" pin="9"/>
 </segment>
 </net>
 <net name="N$20" class="0">
 <segment>
 <wire x1="208.28" y1="-7.62" x2="195.58" y2="-7.62" width="0.1524" layer="91"/>
 <pinref part="IC4" gate="A" pin="0"/>
-<pinref part="AN2" gate="G$1" pin="0"/>
+<pinref part="AN1" gate="G$1" pin="0"/>
 </segment>
 </net>
 <net name="N$21" class="0">
 <segment>
 <wire x1="208.28" y1="25.4" x2="195.58" y2="25.4" width="0.1524" layer="91"/>
 <pinref part="IC3" gate="A" pin="1"/>
-<pinref part="AN1" gate="G$1" pin="1"/>
+<pinref part="AN2" gate="G$1" pin="1"/>
 </segment>
 </net>
 <net name="N$22" class="0">
 <segment>
 <wire x1="208.28" y1="22.86" x2="195.58" y2="22.86" width="0.1524" layer="91"/>
 <pinref part="IC3" gate="A" pin="2"/>
-<pinref part="AN1" gate="G$1" pin="2"/>
+<pinref part="AN2" gate="G$1" pin="2"/>
 </segment>
 </net>
 <net name="N$23" class="0">
 <segment>
 <wire x1="208.28" y1="17.78" x2="195.58" y2="17.78" width="0.1524" layer="91"/>
 <pinref part="IC3" gate="A" pin="4"/>
-<pinref part="AN1" gate="G$1" pin="4"/>
+<pinref part="AN2" gate="G$1" pin="4"/>
 </segment>
 </net>
 <net name="N$24" class="0">
 <segment>
 <wire x1="208.28" y1="20.32" x2="195.58" y2="20.32" width="0.1524" layer="91"/>
 <pinref part="IC3" gate="A" pin="3"/>
-<pinref part="AN1" gate="G$1" pin="3"/>
+<pinref part="AN2" gate="G$1" pin="3"/>
 </segment>
 </net>
 <net name="N$25" class="0">
 <segment>
 <wire x1="208.28" y1="15.24" x2="195.58" y2="15.24" width="0.1524" layer="91"/>
 <pinref part="IC3" gate="A" pin="5"/>
-<pinref part="AN1" gate="G$1" pin="5"/>
+<pinref part="AN2" gate="G$1" pin="5"/>
 </segment>
 </net>
 <net name="N$26" class="0">
 <segment>
 <wire x1="208.28" y1="12.7" x2="195.58" y2="12.7" width="0.1524" layer="91"/>
 <pinref part="IC3" gate="A" pin="6"/>
-<pinref part="AN1" gate="G$1" pin="6"/>
+<pinref part="AN2" gate="G$1" pin="6"/>
 </segment>
 </net>
 <net name="N$27" class="0">
 <segment>
 <wire x1="208.28" y1="10.16" x2="195.58" y2="10.16" width="0.1524" layer="91"/>
 <pinref part="IC3" gate="A" pin="7"/>
-<pinref part="AN1" gate="G$1" pin="7"/>
+<pinref part="AN2" gate="G$1" pin="7"/>
 </segment>
 </net>
 <net name="N$28" class="0">
 <segment>
 <wire x1="208.28" y1="7.62" x2="195.58" y2="7.62" width="0.1524" layer="91"/>
 <pinref part="IC3" gate="A" pin="8"/>
-<pinref part="AN1" gate="G$1" pin="8"/>
+<pinref part="AN2" gate="G$1" pin="8"/>
 </segment>
 </net>
 <net name="N$29" class="0">
 <segment>
 <wire x1="208.28" y1="5.08" x2="195.58" y2="5.08" width="0.1524" layer="91"/>
 <pinref part="IC3" gate="A" pin="9"/>
-<pinref part="AN1" gate="G$1" pin="9"/>
+<pinref part="AN2" gate="G$1" pin="9"/>
 </segment>
 </net>
 <net name="N$30" class="0">
 <segment>
 <wire x1="208.28" y1="27.94" x2="195.58" y2="27.94" width="0.1524" layer="91"/>
 <pinref part="IC3" gate="A" pin="0"/>
-<pinref part="AN1" gate="G$1" pin="0"/>
+<pinref part="AN2" gate="G$1" pin="0"/>
 </segment>
 </net>
 <net name="N$31" class="0">
@@ -5285,8 +5285,8 @@ Source: www.kingbright.com</description>
 <wire x1="220.98" y1="15.24" x2="223.52" y2="15.24" width="0.1524" layer="91"/>
 <wire x1="223.52" y1="15.24" x2="223.52" y2="17.78" width="0.1524" layer="91"/>
 <junction x="223.52" y="17.78"/>
-<pinref part="AN1" gate="G$1" pin="A1"/>
-<pinref part="AN1" gate="G$1" pin="A2"/>
+<pinref part="AN2" gate="G$1" pin="A1"/>
+<pinref part="AN2" gate="G$1" pin="A2"/>
 </segment>
 </net>
 <net name="N$92" class="0">
@@ -5297,8 +5297,8 @@ Source: www.kingbright.com</description>
 <wire x1="223.52" y1="-17.78" x2="223.52" y2="-20.32" width="0.1524" layer="91"/>
 <wire x1="223.52" y1="-20.32" x2="220.98" y2="-20.32" width="0.1524" layer="91"/>
 <junction x="223.52" y="-17.78"/>
-<pinref part="AN2" gate="G$1" pin="A1"/>
-<pinref part="AN2" gate="G$1" pin="A2"/>
+<pinref part="AN1" gate="G$1" pin="A1"/>
+<pinref part="AN1" gate="G$1" pin="A2"/>
 </segment>
 </net>
 <net name="VCC" class="0">

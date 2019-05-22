@@ -25372,6 +25372,7 @@ vypínací 3A
 <text x="129.54" y="208.28" size="1.778" layer="97" ratio="7">GW22LCV
 
 </text>
+<text x="299.72" y="215.9" size="1.778" layer="91">TAB musi být spojen na VOUT</text>
 </plain>
 <instances>
 <instance part="FRAME3" gate="G$1" x="0" y="0" smashed="yes">
@@ -26184,6 +26185,14 @@ vypínací 3A
 <wire x1="55.88" y1="142.24" x2="337.82" y2="142.24" width="0.508" layer="97" style="longdash"/>
 <wire x1="337.82" y1="142.24" x2="337.82" y2="129.54" width="0.508" layer="97" style="longdash"/>
 <text x="78.74" y="228.6" size="5.08" layer="97">VN</text>
+<text x="134.62" y="154.94" size="1.778" layer="91">Upravit EN: ZD FB-GND, krmit přes odpor z UCC, zachovat diodu</text>
+<text x="134.62" y="149.86" size="1.778" layer="91">Změna: R43 = 8k2</text>
+<text x="231.14" y="154.94" size="1.778" layer="91">Horizontálně otočit 3906</text>
+<text x="17.78" y="210.82" size="1.778" layer="91">Udělat buď:
+a) externi tranzistor (nefunguje limit proudu)
+b) 6x nasobic
+c) pouzit jiny menic (MAX1771)</text>
+<text x="58.42" y="157.48" size="1.778" layer="91">Zvětšit R6</text>
 </plain>
 <instances>
 <instance part="U$1" gate="G$1" x="86.36" y="185.42" smashed="yes">
@@ -27244,6 +27253,7 @@ vypínací 3A
 <description>Extended IO</description>
 <plain>
 <wire x1="83.82" y1="111.76" x2="109.22" y2="111.76" width="0.1524" layer="97" style="shortdash"/>
+<text x="246.38" y="167.64" size="1.778" layer="91">Změna: R60 = 1k5</text>
 </plain>
 <instances>
 <instance part="FRAME2" gate="G$1" x="0" y="0" smashed="yes">

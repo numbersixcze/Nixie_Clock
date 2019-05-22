@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!DOCTYPE eagle SYSTEM "eagle.dtd">
-<eagle version="9.3.2">
+<eagle version="9.4.0">
 <drawing>
 <settings>
 <setting alwaysvectorfont="yes"/>
@@ -1726,7 +1726,6 @@ design rules under a new name.</description>
 <signal name="GND">
 <contactref element="IC7" pad="8"/>
 <contactref element="IC8" pad="8"/>
-<contactref element="IC1" pad="12"/>
 <contactref element="IC2" pad="12"/>
 <contactref element="IC3" pad="12"/>
 <contactref element="IC4" pad="12"/>
@@ -1740,6 +1739,7 @@ design rules under a new name.</description>
 <vertex x="160.02" y="0"/>
 <vertex x="0" y="0"/>
 </polygon>
+<contactref element="IC1" pad="12"/>
 </signal>
 <signal name="VCC">
 <contactref element="IC7" pad="16"/>
@@ -2559,18 +2559,6 @@ design rules under a new name.</description>
 <wire x1="50.8" y1="86.995" x2="55.245" y2="82.55" width="0.6096" layer="1"/>
 <wire x1="79.375" y1="82.55" x2="55.245" y2="82.55" width="0.6096" layer="1"/>
 </signal>
-<signal name="230V=">
-<contactref element="R1" pad="2"/>
-<contactref element="R2" pad="2"/>
-<contactref element="R3" pad="2"/>
-<contactref element="R4" pad="2"/>
-<contactref element="SV1" pad="10"/>
-<wire x1="79.375" y1="59.69" x2="79.375" y2="49.53" width="0.6096" layer="16"/>
-<wire x1="79.375" y1="49.53" x2="76.2" y2="49.53" width="0.6096" layer="16"/>
-<wire x1="76.2" y1="49.53" x2="71.755" y2="49.53" width="0.6096" layer="16"/>
-<wire x1="79.375" y1="49.53" x2="80.645" y2="49.53" width="0.6096" layer="16"/>
-<wire x1="80.645" y1="49.53" x2="85.09" y2="49.53" width="0.6096" layer="16"/>
-</signal>
 <signal name="N$89">
 <contactref element="R1" pad="1"/>
 <contactref element="AN4" pad="A"/>
@@ -2636,6 +2624,18 @@ design rules under a new name.</description>
 <wire x1="102.235" y1="38.1" x2="105.41" y2="38.1" width="0.6096" layer="1"/>
 <wire x1="105.41" y1="38.1" x2="107.315" y2="36.195" width="0.6096" layer="1"/>
 <wire x1="107.315" y1="36.195" x2="139.7" y2="36.195" width="0.6096" layer="1"/>
+</signal>
+<signal name="N$41">
+<contactref element="SV1" pad="10"/>
+<contactref element="R1" pad="2"/>
+<contactref element="R2" pad="2"/>
+<contactref element="R3" pad="2"/>
+<contactref element="R4" pad="2"/>
+<wire x1="79.375" y1="49.53" x2="76.2" y2="49.53" width="0.6096" layer="16"/>
+<wire x1="76.2" y1="49.53" x2="71.755" y2="49.53" width="0.6096" layer="16"/>
+<wire x1="79.375" y1="49.53" x2="80.645" y2="49.53" width="0.6096" layer="16"/>
+<wire x1="80.645" y1="49.53" x2="85.09" y2="49.53" width="0.6096" layer="16"/>
+<wire x1="79.375" y1="49.53" x2="79.375" y2="59.69" width="0" layer="19" extent="16-16"/>
 </signal>
 </signals>
 <mfgpreviewcolors>
