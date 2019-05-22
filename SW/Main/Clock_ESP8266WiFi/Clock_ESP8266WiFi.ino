@@ -26,6 +26,7 @@ void handleAccess();
 void handleAccessMessage();
 void handleNTP();
 void handleNTPMessage();
+void handleDixi();
 
 int TestParseToInt(String iStr);
 
@@ -60,6 +61,7 @@ time_t prevDisplay = 0; // when the digital clock was displayed
 
 bool isNtpSet = false;
 bool isAlarmSet = false;
+bool dixiON = true;
 
 //Wi-Fi Access
 String ssid = "TP-LINK";  //  your network SSID (name)
@@ -120,6 +122,7 @@ void setup()
   server.on("/ntpmessage",HTTP_POST,handleNTPMessage);
   server.on("/main",HTTP_GET,handleMain);
   server.on("/logout",HTTP_GET,handleLogout);
+  server.on("/dixi",HTTP_GET,handleDixi);
 
   server.onNotFound(handleNotFound);         // When a client requests an unknown URI (i.e. something other than "/"), call function "handleNotFound"
   server.begin();                           // Actually start the server
@@ -321,7 +324,7 @@ void handleNotFound(){
 
 void handleMain(){
   if(tmpLogin == login && tmpPassword == password){
-    server.send(200, "text/html", "<meta charset='UTF-8' http-equiv='refresh' content='1'> <style>.dot{width:16px;height:16px;background-color:gray;border-radius:50%;display:inline-block}.dot.red{background-color:red}.dot.green{background-color:green}</style> <h1>Vítejte " + tmpLogin + "!</h1><br> Aktuální čas (h,m,s,d,m,r): " + hour() + ":" + minute() + ":" + second() + " " + day() + "." + month() + "." + year() +  "<br> <a href='/settime'><button>Nastavení času</button> </a> <br> <a href='/alarm'><button>Nastavení budíčku</button> <br> <a href='/chlogin'><button>Změna hesla a účtu</button></a><br><a href='/access'><button>Změna nastavení Wi-Fi</button></a><br><a href='/ntp'><button>Změna NTP serveru</button></a> <br> <a href='/logout'><button>Odhlásit</button></a><div style='position: absolute; right: 64px; top: 20px;'>NTP: <span class='" + (isNtpSet ? "green" : "red") + " dot'></span></div> <div style='position: absolute; right: 64px; top: 40px;'>Budíček: <span class='" + (isAlarmSet ? "green" : "red") + " dot'></span></div>");
+    server.send(200, "text/html", "<meta charset='UTF-8' http-equiv='refresh' content='1'> <style>.dot{width:16px;height:16px;background-color:gray;border-radius:50%;display:inline-block}.dot.red{background-color:red}.dot.green{background-color:green}</style> <h1>Vítejte " + tmpLogin + "!</h1><br> Aktuální čas (h,m,s,d,m,r): " + hour() + ":" + minute() + ":" + second() + " " + day() + "." + month() + "." + year() +  "<br> <form action='/dixi' method='GET'> <input type='submit' value='Vypnout digitrony'/></form> <a href='/settime'><button>Nastavení času</button> </a> <br> <a href='/alarm'><button>Nastavení budíčku</button> <br> <a href='/chlogin'><button>Změna hesla a účtu</button></a><br><a href='/access'><button>Změna nastavení Wi-Fi</button></a><br><a href='/ntp'><button>Změna NTP serveru</button></a> <br> <a href='/logout'><button>Odhlásit</button></a><div style='position: absolute; right: 64px; top: 20px;'>NTP: <span class='" + (isNtpSet ? "green" : "red") + " dot'></span></div> <div style='position: absolute; right: 64px; top: 40px;'>Budíček: <span class='" + (isAlarmSet ? "green" : "red") + " dot'></span></div><div style='position: absolute; right: 64px; top: 60px;'>Digitrony: <span class='" + (dixiON ? "green" : "red") + " dot'></span></div>");
   }
   server.send(401, "text/html", "<meta charset='UTF-8'> 401: Neautorizován <br> <a href='/'><button>Vrátit zpět</button>");
 }
@@ -357,7 +360,7 @@ void handleSetMessage(){
 
 void handleAlarm(){
   if(tmpLogin == login && tmpPassword == password){
-    server.send(200, "text/html", "<style>.dot{width:16px;height:16px;background-color:gray;border-radius:50%;display:inline-block}.dot.red{background-color:red}.dot.green{background-color:green}</style> <meta charset='UTF-8'> <h1>Budíček</h1> <p> Budíček nastaven na: <br>" "h:"+ aHours + "  m:" + aMinutes + "</p> <a href='/main'><button>Zpět domů</button></a> <form action='/alarmoff' method='GET'> <input type='submit' value='Vypnout budík'/> </form> <form action='/alarmmessage' method='POST'> h: <input type='number' min='0' max='23' name='afHours'/> m: <input type='number' min='0' max='59' name='afMinutes'/> <input type='submit' value='Nastavit'/> </form> <div style='position: absolute; right: 64px; top: 0px;'>Budíček: <span class='" + (isAlarmSet ? "green" : "red") + " dot'></span></div>");
+    server.send(200, "text/html", "<style>.dot{width:16px;height:16px;background-color:gray;border-radius:50%;display:inline-block}.dot.red{background-color:red}.dot.green{background-color:green}</style> <meta charset='UTF-8'> <h1>Budíček</h1> <p> Budíček nastaven na: <br>" "h:"+ aHours + "  m:" + aMinutes + "</p> <a href='/main'><button>Zpět domů</button></a> <form action='/alarmoff' method='GET'> <input type='submit' value='Vypnout budík'/></form> <form action='/alarmmessage' method='POST'> h: <input type='number' min='0' max='23' name='afHours'/> m: <input type='number' min='0' max='59' name='afMinutes'/> <input type='submit' value='Nastavit'/> </form> <div style='position: absolute; right: 64px; top: 0px;'>Budíček: <span class='" + (isAlarmSet ? "green" : "red") + " dot'></span></div>");
   }
   server.send(401, "text/html", "<meta charset='UTF-8'> 401: Neautorizován <br> <a href='/'><button>Vrátit zpět</button>");
 }
@@ -464,3 +467,10 @@ void handleNTPMessage(){
   }
   server.send(401, "text/html", "<meta charset='UTF-8'> 401: Neautorizován <br> <a href='/'><button>Vrátit zpět</button>");
 };
+
+void handleDixi(){
+ if(tmpLogin == login && tmpPassword == password){
+    dixiON ^= true;
+    server.send(200, "text/html", "<script type='text/javascript'> window.location = '/main'; </script>");
+  }
+}
