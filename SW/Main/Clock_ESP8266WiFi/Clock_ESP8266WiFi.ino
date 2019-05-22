@@ -2,15 +2,14 @@
 #include <ESP8266WiFi.h>
 #include <WiFiUdp.h>
 #include <ESP8266mDNS.h>
-//#include <WiFiClient.h>
 #include <ESP8266WebServer.h>
 
-#define NTPSYNC 180
-#define NAMESERVER "alarm"
+#define NTPSYNC 180         //Interval for sync data from NTP server
+#define NAMESERVER "alarm" //name for DNS, example when you write "alarm" you should write in web browser alarm.local
 
 ESP8266WebServer server(80);    // Create a webserver object that listens for HTTP request on port 80
 
-void handleRoot();              // function prototypes for HTTP handlers
+void handleRoot();              
 void handleMain();
 void handleNotFound();
 void handleLogin();
@@ -29,6 +28,7 @@ void handleNTPMessage();
 
 int TestParseToInt(String iStr);
 
+//temporary variable for save answer from the server
 String iHours = "1";
 String iMinutes = "1";
 String iSeconds = "1";
@@ -37,12 +37,14 @@ String iMonths = "1";
 String iYears = "1";
 String aHours = "1";
 String aMinutes = "1";
-String login = "admin";
-String password = "admin";
+
+//Web access
+String login = "admin";       //Default login
+String password = "admin";    //Default password
 String tmpLogin = "";
 String tmpPassword = "";
 
-
+//temporary variable for convert string to int
 int intHours = 2;
 int intMinutes = 2;
 int intSeconds = 2;
@@ -67,6 +69,7 @@ String ntpServerName = "ntp.cesnet.cz";
 WiFiUDP Udp;
 unsigned int localPort = 8888;  // local port to listen for UDP packets
 
+//Initialize NTP synchronization 
 time_t getNtpTime();
 void digitalClockDisplay();
 void printDigits(int digits);
@@ -81,7 +84,7 @@ void setup()
   Serial.println(ssid);
   WiFi.begin(ssid, pass);
 
-  //Manual set IP
+  //Manual set IP address
 
   /*
   IPAddress ip(192,168,1,205);   
@@ -90,6 +93,7 @@ void setup()
   WiFi.config(ip, gateway, subnet);
   */
 
+  //Connecting to Wi-Fi AP
   while (WiFi.status() != WL_CONNECTED) {
     delay(500);
     Serial.print(".");
@@ -109,8 +113,8 @@ void setup()
   server.on("/", HTTP_GET, handleRoot);        // Call the 'handleRoot' function when a client requests URI "/"
   server.on("/login", HTTP_POST, handleLogin); // Call the 'handleLogin' function when a POST request is made to URI "/login"
   server.on("/setmessage",HTTP_POST,handleSetMessage);
-  server.on("/settime", HTTP_GET, handleSetTime); // Call the 'handleLogin' function when a POST request is made to URI "/login"
-  server.on("/alarm", HTTP_GET, handleAlarm); // Call the 'handleLogin' function when a POST request is made to URI "/login"
+  server.on("/settime", HTTP_GET, handleSetTime);
+  server.on("/alarm", HTTP_GET, handleAlarm); 
   server.on("/alarmmessage",HTTP_POST,handleAlarmMessage);
   server.on("/alarmoff",HTTP_GET,handleAlarmOff);
   server.on("/chlogin",HTTP_GET,handleChLogin);
@@ -123,11 +127,11 @@ void setup()
   server.on("/logout",HTTP_GET,handleLogout);
 
 
-  server.onNotFound(handleNotFound);           // When a client requests an unknown URI (i.e. something other than "/"), call function "handleNotFound"
+  server.onNotFound(handleNotFound);         // When a client requests an unknown URI (i.e. something other than "/"), call function "handleNotFound"
   server.begin();                           // Actually start the server
   Serial.println("HTTP server started");
 
-  //Nastaveni mDNS
+  //Setting Multicast DNS
   if (!MDNS.begin(NAMESERVER)) {
       Serial.println("Error setting up MDNS responder!");
       while (1) {
@@ -142,16 +146,13 @@ void setup()
 
 }
 
-
-
 time_t prevDisplay = 0; // when the digital clock was displayed
 
 void loop()
 {
-
   MDNS.update();
-
   server.handleClient(); 
+  
   if (timeStatus() != timeNotSet) {
     if (now() != prevDisplay) { //update the display only if time has changed
       prevDisplay = now();
@@ -160,12 +161,12 @@ void loop()
   }
 
   if((hour() == aintHours) && (minute() >= aintMinutes) && (isAlarmSet == true)){
-    Serial.println("Budicek");
+    Serial.println("Alarm");
     Serial.println(hour());
     Serial.println(minute());
     Serial.println(aintHours);
     Serial.println(aintMinutes);
-    Serial.println("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!KONEC!!!!!!!!!!!!!!!!!!!!!!!!");
+    Serial.println("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!END OF MESSANGE!!!!!!!!!!!!!!!!!!!!!!!!");
 
     //if(tl === 1) isAlarmSet = false;
     if(minute() == aintMinutes + 1)
@@ -176,7 +177,6 @@ void loop()
 
 
 int TestParseToInt(String iStr){
-    //int tmpResult = 0;
     if( (iStr != "0") || (iStr != "00")){
         if(iStr.toInt() != 0)
             return iStr.toInt();
@@ -274,7 +274,7 @@ void sendNTPpacket(IPAddress &address)
 }
 
 
-void handleRoot() {                          // When URI / is requested, send a web page with a button to toggle the LED
+void handleRoot() {                          // When URI / is requested, send a web page with login form
   server.send(200, "text/html", "<meta charset='UTF-8'> <form action=\"/login\" method=\"POST\"><input type=\"text\" name=\"username\" placeholder=\"Uživatel\"></br><input type=\"password\" name=\"password\" placeholder=\"Heslo\"></br><input type=\"submit\" value=\"Přihlásit\"></form><p>Zkus 'admin' a heslo 'admin' ...</p>");
  }
 
@@ -316,12 +316,12 @@ void handleSetTime(){
 }
 
 void handleNotFound(){
-  server.send(404, "text/html", "<meta charset='UTF-8'> 404: Stránka nenalezena"); // Send HTTP status 404 (Not Found) when there's no handler for the URI in the request
+  server.send(404, "text/html", "<meta charset='UTF-8'> 404: Stránka nenalezena"); // Send HTTP status 404 (Not Found) when there's no handler for the URL in the request
 }
 
 void handleMain(){
   if(tmpLogin == login && tmpPassword == password){
-    server.send(200, "text/html", "<meta charset='UTF-8' http-equiv='refresh' content='1'> <style>.dot{width:16px;height:16px;background-color:gray;border-radius:50%;display:inline-block}.dot.red{background-color:red}.dot.green{background-color:green}</style> <h1>Vítejte " + tmpLogin + "!</h1><br> Aktualni čas(h,m,s,d,m,r): " + hour() + ":" + minute() + ":" + second() + ": " + day() + "." + month() + "." + year() +  "<br> <a href='/settime'><button>Nastavení času</button> </a> <br> <a href='/alarm'><button>Nastavení budíčku</button> <br> <a href='/chlogin'><button>Změna hesla a účtu</button></a><br><a href='/access'><button>Změna nastavení Wi-Fi</button></a><br><a href='/ntp'><button>Změna NTP serveru</button></a> <br> <a href='/logout'><button>Odhlásit</button></a><div style='position: absolute; right: 64px; top: 20px;'>NTP: <span class='" + (isNtpSet ? "green" : "red") + " dot'></span></div> <div style='position: absolute; right: 64px; top: 40px;'>Budíček: <span class='" + (isAlarmSet ? "green" : "red") + " dot'></span></div>");
+    server.send(200, "text/html", "<meta charset='UTF-8' http-equiv='refresh' content='1'> <style>.dot{width:16px;height:16px;background-color:gray;border-radius:50%;display:inline-block}.dot.red{background-color:red}.dot.green{background-color:green}</style> <h1>Vítejte " + tmpLogin + "!</h1><br> Aktualní čas (h,m,s,d,m,r): " + hour() + ":" + minute() + ":" + second() + ": " + day() + "." + month() + "." + year() +  "<br> <a href='/settime'><button>Nastavení času</button> </a> <br> <a href='/alarm'><button>Nastavení budíčku</button> <br> <a href='/chlogin'><button>Změna hesla a účtu</button></a><br><a href='/access'><button>Změna nastavení Wi-Fi</button></a><br><a href='/ntp'><button>Změna NTP serveru</button></a> <br> <a href='/logout'><button>Odhlásit</button></a><div style='position: absolute; right: 64px; top: 20px;'>NTP: <span class='" + (isNtpSet ? "green" : "red") + " dot'></span></div> <div style='position: absolute; right: 64px; top: 40px;'>Budíček: <span class='" + (isAlarmSet ? "green" : "red") + " dot'></span></div>");
   }
   server.send(401, "text/html", "<meta charset='UTF-8'> 401: Neautorizován <br> <a href='/'><button>Vrátit zpět</button>");
 }
