@@ -250,6 +250,18 @@ void loop()
     }
   }
 
+  //Serial.println(aintHours);
+  //Serial.print(aintMinutes);
+  delay(10);
+  if((hour() == aintHours) && (minute() >= aintMinutes) && (isAlarmSet == true)){
+    BuzzerOn();
+    Serial.println("Budíček");
+    if(minute() == aintMinutes + 1){
+      isAlarmSet = false;
+      BuzzerOff();
+      Serial.println("!!!!!!!!!!!!!!!!!!!!!!Vypnuto!!!!!!!!!!");
+    }
+  }
 }
 
 
@@ -414,12 +426,19 @@ void handleSetMessage(){
       iMonths = server.arg("fMonths");
       iYears = server.arg("fYears");
       
-      intHours = TestParseToInt(iHours);
+      /*intHours = TestParseToInt(iHours);
       intMinutes = TestParseToInt(iMinutes);
       intSeconds = TestParseToInt(iSeconds);
       intDays = TestParseToInt(iDays);
       intMonths = TestParseToInt(iMonths);
-      intYears = TestParseToInt(iYears);
+      intYears = TestParseToInt(iYears);*/
+
+      intHours = iHours.toInt();
+      intMinutes = iMinutes.toInt();
+      intSeconds = iSeconds.toInt();
+      intDays = iDays.toInt();
+      intMonths = iMonths.toInt();
+      intYears = iYears.toInt();
       
       if((intHours != 999) || (intMinutes != 999) || (intSeconds != 999) || (intDays != 999) || (intMonths != 999) || (intYears != 999))    {
         setTime(intHours,intMinutes,intSeconds,intDays,intMonths,intYears);
@@ -446,8 +465,8 @@ void handleAlarmMessage(){
       if((server.arg("afHours") != NULL) && (server.arg("afMinutes") != NULL)){
         aHours = server.arg("afHours");
         aMinutes = server.arg("afMinutes");
-        aintMinutes = TestParseToInt(aMinutes);
-        aintHours   = TestParseToInt(aHours);
+        aintMinutes = aMinutes.toInt();
+        aintHours   = aHours.toInt();
         isAlarmSet = true;
         server.send(200, "text/html", "<script type='text/javascript'> window.location = '/alarm'; </script>");
         return;
@@ -581,7 +600,8 @@ void SetNX(uint8_t NumLeftPair, char Dots, uint8_t NumRightPair)
   StateN = !StateN;
   if(((dixiON == true) && TimeDate > 0) || (dixiON == false))
     StateN = true;
-
+  if (!dixiON)
+    StateN = false;
   if(StateN)
       {
       ClockDots(Dots);
@@ -759,14 +779,16 @@ void SlowLoop()
   else
     SetNX(day(), '.', month());
 
-  if((hour() == aintHours) && (minute() >= aintMinutes) && (isAlarmSet == true)){
+  /*if((hour() == aintHours) && (minute() >= aintMinutes) && (isAlarmSet == true)){
     BuzzerOn();
+    Serial.println("Budíček");
     if(minute() == aintMinutes + 1){
       isAlarmSet = false;
       BuzzerOff();
+      Serial.println("!!!!!!!!!!!!!!!!!!!!!!Vypnuto!!!!!!!!!!");
     }
       
-  }
+  }*/
   
   --TimeDate;
   if (TimeDate >= 250)
