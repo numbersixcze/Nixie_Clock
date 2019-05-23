@@ -24681,13 +24681,6 @@ Based on the following sources:
 <sheet>
 <description>Controll</description>
 <plain>
-<text x="7.62" y="233.68" size="1.778" layer="91">
-71-CRCW1206-2.7K-E3
-
-80-C1206C104M5R
-
-
-</text>
 </plain>
 <instances>
 <instance part="SV1" gate="1" x="330.2" y="81.28" smashed="yes" rot="R180">
