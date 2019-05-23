@@ -128,238 +128,24 @@ void SerialUpdate();    //not used, only for debug. Sending some data over seria
 
 // fce 
 bool StateN = 0;
-void SetNX(uint8_t NumLeftPair, char Dots, uint8_t NumRightPair)
-{
-    uint8_t NumNXSet[2]; //[2]
-    NumNXSet[0] = ((NumLeftPair % 10) << 4) | (NumLeftPair / 10);
-    NumNXSet[1] = ((NumRightPair % 10) << 4) | (NumRightPair / 10);
-    
-    //PCB bug correction - exchanged 0 and 1
-    if((NumLeftPair % 10) == 1)
-        NumNXSet[0] &= ~16;
-    if((NumLeftPair % 10) == 0)
-        NumNXSet[0] |= 16;
-    if((NumLeftPair / 10) == 1)
-        NumNXSet[0] &= ~1;
-    if((NumLeftPair / 10) == 0)
-        NumNXSet[0] |= 1;
-
-    if((NumRightPair % 10) == 1)
-        NumNXSet[1] &= ~16;
-    if((NumRightPair % 10) == 0)
-        NumNXSet[1] |= 16;
-    if((NumRightPair / 10) == 1)
-        NumNXSet[1] &= ~1;
-    if((NumRightPair / 10) == 0)
-        NumNXSet[1] |= 1;
-
-    NX595.setAll(NumNXSet); //Sends bytes
-    
-    //Blinking dots
-    StateN = !StateN;
-    if(((dixiON == true) && TimeDate > 0) || (dixiON == false))
-      StateN = true;
-
-    if(StateN)
-        {
-        ClockDots(Dots);
-        StatusLedOn();
-        }
-    else
-        {
-        StatusLedOff();
-        ClockDots(' ');        //Sets dots
-        }
-}
-
-void SerialUpdate()
-{
-    Serial.write(27);       // ESC command
-    Serial.print("[2J");    // clear screen command
-    Serial.write(27);
-    Serial.print("[H");     // cursor to home command
-
-    Serial.print("Buzzer:\t");
-    Serial.print(EIO595.get(0));
-    Serial.print("\tRele:\t");
-    Serial.print(EIO595.get(1));
-    Serial.print("\tStatus:\t");
-    Serial.print(EIO595.get(2));
-    Serial.print("\tLED top:");
-    Serial.print(EIO595.get(3));
-    Serial.println("");
-
-    Serial.print("LED bottom:\t");
-    Serial.print(EIO595.get(4));
-    Serial.print("\tMul_A0:\t");
-    Serial.print(EIO595.get(5));
-    Serial.print("\tMul_A1:\t");
-    Serial.print(EIO595.get(6));
-    Serial.print("\tMul_A2:\t");
-    Serial.print(EIO595.get(7));
-    Serial.println("");
-
-    Serial.print("VN_U:\t");
-    Serial.print(GetSignal(VN_U));
-    Serial.print("V\tVN_I:\t");
-    Serial.print(GetSignal(VN_I));
-    Serial.print("V\tOV_OC:\t");
-    Serial.print(GetSignal(OC_OV));
-    Serial.print("V\tNoise_AD:\t");
-    Serial.print(GetSignal(NoiseAD));
-    Serial.println("V");
-
-    Serial.print("PWR_Status:\t");
-    Serial.print(GetSignal(PWR_Status));
-    Serial.print("V\tBtn_1:\t");
-    Serial.print(GetSignal(Btn1));
-    Serial.print("V\tBtn_2:\t");
-    Serial.print(GetSignal(Btn2));
-    Serial.print("V\tUCC_U:\t");
-    Serial.print(GetSignal(UCC_U));
-    Serial.println("V");
-
-}
-void VnOn()
-{
-    digitalWrite(VN_EN_Pin, 1);
-}
-
-void VnOff()
-{
-    digitalWrite(VN_EN_Pin, 0);
-}
-
-void ClockDots(char Dots)
-{
-    switch (Dots)
-    {
-    case '\'':
-        EIO595.setNoUpdate(3,1);
-        EIO595.setNoUpdate(4,0);
-        EIO595.updateRegisters();
-        break;
-
-    case '.':
-        EIO595.setNoUpdate(3,0);
-        EIO595.setNoUpdate(4,1);
-        EIO595.updateRegisters();
-        break;
-
-    case ':':
-        EIO595.setNoUpdate(3,1);
-        EIO595.setNoUpdate(4,1);
-        EIO595.updateRegisters();
-        break;
-    
-    default:
-        EIO595.setNoUpdate(3,0);
-        EIO595.setNoUpdate(4,0);
-        EIO595.updateRegisters();
-        break;
-    }
-}
-double ReadSignal(Signals MulSig)
-{
-    //nastaveni cteneho vstupu
-    EIO595.setNoUpdate(5, (uint8_t)MulSig & 1);
-    EIO595.setNoUpdate(6, ((uint8_t)MulSig >> 1) & 1);
-    EIO595.setNoUpdate(7, ((uint8_t)MulSig >> 2) & 1);
-    EIO595.updateRegisters();
-    return ((3.2/1023.0*(double)analogRead(AnalogPin))-0.0); //Convert to voltage
-}
-
-double GetSignal(Signals Sig)
-{
-    return RSignals[(uint8_t)Sig];
-}
-
-void BuzzerOn()
-{
-    EIO595.set(0,1);
-}
-void BuzzerOff()
-{
-   EIO595.set(0,0);
-
-}
-
-void ReleOn()
-{
-    EIO595.set(1,1);
-}
-
-void ReleOff()
-
-{
-    EIO595.set(1,0);
-}
-
-void StatusLedOn()
-{
-    EIO595.set(2,1);
-}
-
-void StatusLedOff()
-{
-    EIO595.set(2,0);
-}
+void SetNX(uint8_t NumLeftPair, char Dots, uint8_t NumRightPair);
+void SerialUpdate();
+void VnOn();
+void VnOff();
+void ClockDots(char Dots);
+double ReadSignal(Signals MulSig);
+double GetSignal(Signals Sig);
+void BuzzerOn();
+void BuzzerOff();
+void ReleOn();
+void ReleOff();
+void StatusLedOn();
+void StatusLedOff();
 
 uint8_t ReadRotate = 0;
 uint16_t LoopCounter = 0;
-void FastLoop()
-{
-    //Read inputs everytime
-    RSignals[ReadRotate] = ReadSignal((Signals)ReadRotate); //cte postupne vsechny vstupy
-    if(dixiON)
-      VnOn();
-    else
-      VnOff();
-    if(GetSignal(Btn2) > 2.0){
-      isAlarmSet = false;
-      BuzzerOff();
-    }
-      
-    ++ReadRotate;
-    ReadRotate  %= 8;
-    ++LoopCounter;
-    if (!(LoopCounter % SlowLoopMul))
-        SlowLoop();
-}
-
-
-void SlowLoop()
-{
-  //Slow loop
-  if(GetSignal(Btn1) > 2.0)
-    TimeDate = 5; //5 cycles change to variable
-  if(!TimeDate)
-    SetNX(hour(), ':', minute());
-  else
-    SetNX(day(), '.', month());
-
-  if((hour() == aintHours) && (minute() >= aintMinutes) && (isAlarmSet == true)){
-    BuzzerOn();
-    /*Serial.println("Alarm");
-    Serial.println(hour());
-    Serial.println(minute());
-    Serial.println(aintHours);
-    Serial.println(aintMinutes);
-    Serial.println("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!END OF MESSANGE!!!!!!!!!!!!!!!!!!!!!!!!");*/
-
-    if(minute() == aintMinutes + 1){
-      isAlarmSet = false;
-      BuzzerOff();
-    }
-      
-  }
-  
-  --TimeDate;
-  if (TimeDate >= 250)
-    TimeDate = 0;
-}
-
-
+void FastLoop();
+void SlowLoop();
 
 
 void setup()
@@ -378,9 +164,7 @@ void setup()
 
   //Begin serial comm
   Serial.begin(115200);
-  
-  
- 
+   
   //while (!Serial) ; // Needed for Leonardo only
   delay(250);
   Serial.print("Connecting to ");
@@ -404,7 +188,6 @@ void setup()
   Serial.print("IP number assigned by DHCP is ");
   Serial.println(WiFi.localIP());
   
-
   server.on("/", HTTP_GET, handleRoot);        // Call the 'handleRoot' function when a client requests URI "/"
   server.on("/login", HTTP_POST, handleLogin); // Call the 'handleLogin' function when a POST request is made to URI "/login"
   server.on("/setmessage",HTTP_POST,handleSetMessage);
@@ -765,4 +548,227 @@ void handleDixi(){
     dixiON ^= true;
     server.send(200, "text/html", "<script type='text/javascript'> window.location = '/main'; </script>");
   }
+}
+
+void SetNX(uint8_t NumLeftPair, char Dots, uint8_t NumRightPair)
+{
+  uint8_t NumNXSet[2]; //[2]
+  NumNXSet[0] = ((NumLeftPair % 10) << 4) | (NumLeftPair / 10);
+  NumNXSet[1] = ((NumRightPair % 10) << 4) | (NumRightPair / 10);
+  
+  //PCB bug correction - exchanged 0 and 1
+  if((NumLeftPair % 10) == 1)
+      NumNXSet[0] &= ~16;
+  if((NumLeftPair % 10) == 0)
+      NumNXSet[0] |= 16;
+  if((NumLeftPair / 10) == 1)
+      NumNXSet[0] &= ~1;
+  if((NumLeftPair / 10) == 0)
+      NumNXSet[0] |= 1;
+
+  if((NumRightPair % 10) == 1)
+      NumNXSet[1] &= ~16;
+  if((NumRightPair % 10) == 0)
+      NumNXSet[1] |= 16;
+  if((NumRightPair / 10) == 1)
+      NumNXSet[1] &= ~1;
+  if((NumRightPair / 10) == 0)
+      NumNXSet[1] |= 1;
+
+  NX595.setAll(NumNXSet); //Sends bytes
+  
+  //Blinking dots
+  StateN = !StateN;
+  if(((dixiON == true) && TimeDate > 0) || (dixiON == false))
+    StateN = true;
+
+  if(StateN)
+      {
+      ClockDots(Dots);
+      StatusLedOn();
+      }
+  else
+      {
+      StatusLedOff();
+      ClockDots(' ');        //Sets dots
+      }
+}
+
+void SerialUpdate()
+{
+  Serial.write(27);       // ESC command
+  Serial.print("[2J");    // clear screen command
+  Serial.write(27);
+  Serial.print("[H");     // cursor to home command
+
+  Serial.print("Buzzer:\t");
+  Serial.print(EIO595.get(0));
+  Serial.print("\tRele:\t");
+  Serial.print(EIO595.get(1));
+  Serial.print("\tStatus:\t");
+  Serial.print(EIO595.get(2));
+  Serial.print("\tLED top:");
+  Serial.print(EIO595.get(3));
+  Serial.println("");
+
+  Serial.print("LED bottom:\t");
+  Serial.print(EIO595.get(4));
+  Serial.print("\tMul_A0:\t");
+  Serial.print(EIO595.get(5));
+  Serial.print("\tMul_A1:\t");
+  Serial.print(EIO595.get(6));
+  Serial.print("\tMul_A2:\t");
+  Serial.print(EIO595.get(7));
+  Serial.println("");
+
+  Serial.print("VN_U:\t");
+  Serial.print(GetSignal(VN_U));
+  Serial.print("V\tVN_I:\t");
+  Serial.print(GetSignal(VN_I));
+  Serial.print("V\tOV_OC:\t");
+  Serial.print(GetSignal(OC_OV));
+  Serial.print("V\tNoise_AD:\t");
+  Serial.print(GetSignal(NoiseAD));
+  Serial.println("V");
+
+  Serial.print("PWR_Status:\t");
+  Serial.print(GetSignal(PWR_Status));
+  Serial.print("V\tBtn_1:\t");
+  Serial.print(GetSignal(Btn1));
+  Serial.print("V\tBtn_2:\t");
+  Serial.print(GetSignal(Btn2));
+  Serial.print("V\tUCC_U:\t");
+  Serial.print(GetSignal(UCC_U));
+  Serial.println("V");
+}
+
+void VnOn()
+{
+  digitalWrite(VN_EN_Pin, 1);
+}
+
+void VnOff()
+{
+  digitalWrite(VN_EN_Pin, 0);
+}
+
+void ClockDots(char Dots)
+{
+  switch (Dots)
+  {
+  case '\'':
+      EIO595.setNoUpdate(3,1);
+      EIO595.setNoUpdate(4,0);
+      EIO595.updateRegisters();
+      break;
+
+  case '.':
+      EIO595.setNoUpdate(3,0);
+      EIO595.setNoUpdate(4,1);
+      EIO595.updateRegisters();
+      break;
+
+  case ':':
+      EIO595.setNoUpdate(3,1);
+      EIO595.setNoUpdate(4,1);
+      EIO595.updateRegisters();
+      break;
+  
+  default:
+      EIO595.setNoUpdate(3,0);
+      EIO595.setNoUpdate(4,0);
+      EIO595.updateRegisters();
+      break;
+  }
+}
+
+double ReadSignal(Signals MulSig)
+{
+  //Read input settings
+  EIO595.setNoUpdate(5, (uint8_t)MulSig & 1);
+  EIO595.setNoUpdate(6, ((uint8_t)MulSig >> 1) & 1);
+  EIO595.setNoUpdate(7, ((uint8_t)MulSig >> 2) & 1);
+  EIO595.updateRegisters();
+  return ((3.2/1023.0*(double)analogRead(AnalogPin))-0.0); //Convert to voltage
+}
+
+double GetSignal(Signals Sig)
+{
+  return RSignals[(uint8_t)Sig];
+}
+
+void BuzzerOn()
+{
+  EIO595.set(0,1);
+}
+
+void BuzzerOff()
+{
+  EIO595.set(0,0);
+
+}
+
+void ReleOn()
+{
+  EIO595.set(1,1);
+}
+
+void ReleOff()
+
+{
+  EIO595.set(1,0);
+}
+
+void StatusLedOn()
+{
+  EIO595.set(2,1);
+}
+
+void StatusLedOff()
+{
+  EIO595.set(2,0);
+}
+
+void FastLoop()
+{
+  //Read inputs everytime
+  RSignals[ReadRotate] = ReadSignal((Signals)ReadRotate); //Reads all the inputs
+  if(dixiON)
+    VnOn();
+  else
+    VnOff();
+  if(GetSignal(Btn2) > 2.0){
+    isAlarmSet = false;
+    BuzzerOff();
+  }
+    
+  ++ReadRotate;
+  ReadRotate  %= 8;
+  ++LoopCounter;
+  if (!(LoopCounter % SlowLoopMul))
+      SlowLoop();
+}
+
+void SlowLoop()
+{
+  //Slow loop
+  if(GetSignal(Btn1) > 2.0)
+    TimeDate = 5; //5 cycles change to variable
+  if(!TimeDate)
+    SetNX(hour(), ':', minute());
+  else
+    SetNX(day(), '.', month());
+
+  if((hour() == aintHours) && (minute() >= aintMinutes) && (isAlarmSet == true)){
+    BuzzerOn();
+    if(minute() == aintMinutes + 1){
+      isAlarmSet = false;
+      BuzzerOff();
+    }
+      
+  }
+  
+  --TimeDate;
+  if (TimeDate >= 250)
+    TimeDate = 0;
 }
