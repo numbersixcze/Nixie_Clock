@@ -18,7 +18,7 @@
     "fs-extra": "^7.0.1",
     "he": "^1.2.0",
     "html-minifier": "^4.0.0",
-    "lodash": "^4.17.11",
+    "lodash": "^4.17.13",
     "match-all": "^1.2.5",
     "mustache": "^3.0.1",
     "node-watch": "^0.6.2"
